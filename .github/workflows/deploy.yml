@@ -35,6 +35,18 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages project create flour-to-the-people --production-branch=main
 
+      # Turns payments on when the GitHub secrets STRIPE_SECRET_KEY and
+      # STRIPE_PUBLISHABLE_KEY exist: orders database, Stripe webhook, Pages secrets.
+      # Skips itself when they do not. See scripts/ci-payments.sh.
+      - name: Set up payments and the orders database
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          SITE_URL: https://flour-to-the-people-5vp.pages.dev
+        run: bash scripts/ci-payments.sh
+
       # Deploys public/ as the site and functions/ as the Stripe API.
       # wrangler.toml supplies the D1 binding named DB.
       - name: Deploy to Cloudflare Pages
