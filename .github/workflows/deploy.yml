@@ -15,9 +15,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Fails the build when a price in public/index.html differs from
+      # functions/_lib/products.js (the server price is what customers pay).
+      - name: Check that page prices match server prices
+        run: node scripts/check-prices.mjs
+
+      # Fails the build when any font-size below 12px appears in public/index.html.
+      - name: Check the 12px font floor
+        run: node scripts/check-fonts.mjs
+
+      # Creates the free Cloudflare Pages project on the first run. Later runs
+      # report "already exists", which is expected, so this step never fails the build.
+      - name: Create the Pages project if it does not exist
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages project create flour-to-the-people --production-branch=main
+
+      # Deploys public/ as the site and functions/ as the Stripe API.
+      # wrangler.toml supplies the D1 binding named DB.
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy . --project-name=flour-to-the-people --branch=main
+          command: pages deploy public --project-name=flour-to-the-people --branch=main

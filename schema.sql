@@ -1,5 +1,5 @@
 -- D1 schema for Flour to the People
--- Apply with: wrangler d1 execute flour-to-the-people --file=schema.sql --remote
+-- Apply with: wrangler d1 execute flour-to-the-people-orders --file=schema.sql --remote
 --
 -- Two tables:
 --   orders          — one row per successful payment

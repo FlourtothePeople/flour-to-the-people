@@ -1,1 +1,11 @@
+# Wrangler local state and dependencies
 .wrangler/
+node_modules/
+
+# Secrets: never commit any of these
+.env
+.env.*
+!.env.handoff.example
+.dev.vars
+.dev.vars.*
+*.secrets.json

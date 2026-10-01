@@ -1,0 +1,20 @@
+{
+  "name": "flour-to-the-people",
+  "private": true,
+  "type": "module",
+  "description": "flourtothepeople.org: static site in public/, Stripe checkout functions in functions/, orders in Cloudflare D1.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "doctor": "bash scripts/00-doctor.sh",
+    "check": "node scripts/check-prices.mjs && node scripts/check-fonts.mjs",
+    "test:local": "bash scripts/test-local.sh",
+    "dev": "wrangler pages dev public",
+    "deploy:direct": "wrangler pages deploy public --project-name=flour-to-the-people --branch=main",
+    "smoke": "bash scripts/06-smoke-test.sh"
+  },
+  "devDependencies": {
+    "wrangler": "^4.145.0"
+  }
+}

@@ -1,0 +1,35 @@
+# The site follows strict rules set by its original author, and three designs were tried and rejected
+
+Follow these rules when changing `public/index.html`. Items marked "checked" are enforced by a script or were confirmed in the file.
+
+## Structure
+
+- The site has five tabs in the top bar: Home, Shop, Recipes, FAQs, Contact. Shop does not open its own page; it scrolls Home to the product filter row (`id="filt-anchor"`, function `scrollToFlours()`).
+- Home, Shop, and Contact use the red and black scheme. Recipes and FAQs use the green and black scheme (the tab class `g`). The top bar border and the selected tab take the page's color.
+- The filter buttons above the products are All, Bread Flours, Ancient Grains, Gluten-Free, Mixes, and Grain-Free Flours (checked). A product may belong to several categories through the space-separated `data-c` attribute (for example `ancient gf`).
+- Recipe cards open on click and stay open (checked: the click handler tests `classList.contains('recipe-card')`).
+
+## Type, size, and color
+
+- **No font size below 12px, anywhere** (checked by `npm run check`). Inline `style=""` attributes override stylesheet rules, so earlier violations came from inline attributes. Address lines and hours in the location tables had `font-size:9px` inline until they were replaced by classes.
+- The font variables `--fd`, `--fb`, and `--fc` start with `Space Mono`; body text falls back to Verdana (checked).
+- The palette variables are `--k` #0A0A0A, `--r` #CC0000, `--g` #1A6B1A, `--w` #F0EDE6 (checked). Prices use amber #FFA000 with a soft glow (checked).
+- Color animations use OKLCH with `@property` so the hue changes smoothly. The top bar tabs cycle over 59 seconds (checked). Every animation needs a `prefers-reduced-motion` fallback (the file has five such blocks), and no animation may flash: keep luminance constant while hue changes.
+- The author prefers compact layouts: small padding and line height, one row instead of several where content fits.
+
+## Wording
+
+- Use "worker-owned and controlled" and "syndicate" (the earlier text said "cooperative"). The location subtitle is "Appalachia".
+- Product descriptions and ingredient lists were corrected from the actual bag labels (commit `83b02cd`). Do not reword ingredients without the label in hand.
+
+## Designs tried and rejected (do not propose them again)
+
+1. **Glass-gem corn photo as a tiled page background with a heavy black stroke on all text.** Three implementations failed to render cleanly: stacked `text-shadow` layers produced ghost outlines, a duplicate-text pseudo-element with `z-index:-1` disappeared behind ancestor stacking contexts, and a global `text-shadow` on `body` inherited into selected tabs and hid their black-on-red text. It was removed completely.
+2. **Muted earthy palette (umber, iron oxide, moss, oatmeal).** The author disliked it.
+3. **Red and black diagonal flag behind the hero.** Replaced by the full-width embroidered banner image `public/images/img-000-602b7441.jpg`.
+
+## Working method the author expects
+
+- Changes should work on the first or second attempt. After repeated failures on one feature, revert cleanly to the last working state instead of stacking fixes.
+- After any visual change, open the page in a browser or screenshot it and look at the result before reporting success.
+- Keep images as files in `public/images/`, compressed as JPEG: the 18 product photos are 500 by 643 px, the hero banner is 1200 by 674 px, and all 19 files total about 970 KB (checked). The earlier single-file version embedded images as base64, which made that file several times larger.

@@ -1,0 +1,1 @@
+Read `AGENTS.md` in this folder completely before doing anything else. It lists which steps an agent can perform, which steps need the human, the order of the scripts in `scripts/`, and the safety rules. Start with `npm run doctor`.
