@@ -11,6 +11,7 @@ jobs:
     permissions:
       contents: read
       deployments: write
+      statuses: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,8 +38,22 @@ jobs:
       # Deploys public/ as the site and functions/ as the Stripe API.
       # wrangler.toml supplies the D1 binding named DB.
       - name: Deploy to Cloudflare Pages
+        id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy public --project-name=flour-to-the-people --branch=main
+
+      # Records the deployed web address on the commit, so anyone (or any agent)
+      # can find it on GitHub without reading the logs.
+      - name: Record the site address on the commit
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          URL: ${{ steps.deploy.outputs.deployment-url }}
+        run: |
+          echo "Deployed to: $URL"
+          gh api "repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+            -f state=success -f context="Cloudflare Pages" \
+            -f description="Site deployed" -f target_url="$URL"
