@@ -1552,8 +1552,8 @@ ol.rc-list li::before {
   <div class="manifesto-item"><div class="manifesto-head">What makes stone-ground flour different from store-bought?</div><p class="manifesto-body">Industrial roller milling separates the grain into bran, germ, and endosperm — removes the bran and germ, and mills only the starchy endosperm into white flour. Stone milling grinds the whole grain together in a single pass. The bran, germ, and endosperm are never separated. More fiber, more minerals, more B vitamins, and significantly more flavor.</p></div>
   <div class="manifesto-item"><div class="manifesto-head">Are all your products certified organic?</div><p class="manifesto-body">Yes. Every grain we source and mill is certified organic. We don't blend organic and conventional grain, and we don't handle any non-organic product in our facility.</p></div>
   <div class="manifesto-item"><div class="manifesto-head">Can I substitute your flour 1:1 for commercial flour in recipes?</div><p class="manifesto-body">For most recipes, yes — but whole-grain flours absorb liquid differently than refined white flour. You'll likely need slightly more liquid (10–15% more). Our pastry flour is closest to commercial all-purpose in performance and can substitute 1:1 in most baking.</p></div>
-  <div class="manifesto-item"><div class="manifesto-head">How does online ordering work?</div><p class="manifesto-body">Add items to your cart, enter your shipping address at checkout, and pay by card, Apple Pay, Google Pay, Link, ACH bank transfer, Klarna, Afterpay, or Affirm. You'll get a payment confirmation by email immediately. We ship via USPS Priority Mail within 2 business days.</p></div>
-  <div class="manifesto-item"><div class="manifesto-head">Do you ship?</div><p class="manifesto-body">Yes — we ship within the continental United States. Shipping is a flat $8.00 per order.</p></div>
+  <div class="manifesto-item"><div class="manifesto-head">How does online ordering work?</div><p class="manifesto-body">Add items to your cart, enter your shipping address at checkout, and pay by card, Apple Pay, Google Pay, Link, ACH bank transfer, Klarna, Afterpay, or Affirm. You'll get a payment confirmation by email immediately. We ship via USPS within 2 business days.</p></div>
+  <div class="manifesto-item"><div class="manifesto-head">Do you ship?</div><p class="manifesto-body">Yes — we ship within the continental United States. You pay what the postage actually costs us: at checkout, your ZIP code and the weight of your order set the price, using the cheapest USPS option (Ground Advantage or Priority Mail Flat Rate) at USPS online rates. Shipping a single bag typically runs $8–12.</p></div>
   <div class="manifesto-item"><div class="manifesto-head">How long does your flour last?</div><p class="manifesto-body">Room temperature in a sealed container: 1–3 months. Refrigerator: 6 months. Freezer: up to 1 year. Whole-grain flour contains the germ's natural oils — for maximum freshness, keep it cool and sealed. A paint-like or pencil-shavings smell means it's time for a fresh bag.</p></div>
   <div class="manifesto-item"><div class="manifesto-head">What does "worker-owned" mean for the business?</div><p class="manifesto-body">Everyone at the mill has an equal vote on major decisions — pricing, sourcing, expansion, how to use the year's earnings. There are no outside owners. The people who do the work make the calls together.</p></div>
 </div>
@@ -1585,9 +1585,9 @@ ol.rc-list li::before {
   <div class="citems" id="citems"></div>
   <div class="cft">
     <div class="csub"><span>Subtotal</span><span id="csub">$0.00</span></div>
-    <div class="csub"><span>Shipping</span><span id="cship">$8.00</span></div>
+    <div class="csub"><span>Shipping</span><span id="cship">By ZIP at checkout</span></div>
     <div class="ctot"><span>Total</span><span id="ctot">$0.00</span></div>
-    <div class="snote">Flat $8 shipping · Tax calculated at checkout</div>
+    <div class="snote">USPS shipping at cost, by ZIP code · Tax at checkout</div>
     <button class="btn btn-a btn-fw" id="checkout-btn" onclick="openCheckout()">Proceed to Checkout →</button>
   </div>
 </div>
@@ -1601,13 +1601,13 @@ ol.rc-list li::before {
       <!-- STEP 1: Shipping address -->
       <form id="cform" onsubmit="goToPayment(event)">
         <div class="osum"><h4>Order Summary</h4><div id="olines"></div></div>
-        <div class="fnote">Shipping to US addresses. Tax calculated at the next step.</div>
+        <div class="fnote">Shipping to US addresses, priced from your ZIP code at USPS online rates. Tax calculated at the next step.</div>
         <div class="fr"><div class="fg"><label for="fname">Full Name<span class="req" aria-label="required">*</span></label><input id="fname" name="name" aria-required="true" required placeholder="Jane Smith"></div><div class="fg"><label for="fphone">Phone</label><input id="fphone" name="phone" placeholder="(276) 555-0000"></div></div>
         <div class="fg"><label for="femail">Email<span class="req" aria-label="required">*</span></label><input type="email" id="femail" name="email" aria-required="true" required placeholder="you@example.com"></div>
         <div class="fg"><label for="faddress">Address<span class="req" aria-label="required">*</span></label><input id="faddress" name="address" aria-required="true" required placeholder="123 Main St"></div>
         <div class="fg"><label for="faddress2">Apt / Suite / Unit</label><input id="faddress2" name="address2" placeholder="Optional"></div>
         <div class="fr"><div class="fg"><label for="fcity">City<span class="req" aria-label="required">*</span></label><input id="fcity" name="city" aria-required="true" required placeholder="Floyd"></div><div class="fg"><label for="fstate">State<span class="req" aria-label="required">*</span></label><input id="fstate" name="state" aria-required="true" required placeholder="VA" maxlength="2"></div></div>
-        <div class="fr"><div class="fg"><label for="fzip">ZIP<span class="req" aria-label="required">*</span></label><input id="fzip" name="zip" aria-required="true" required placeholder="24091"></div><div class="fg"></div></div>
+        <div class="fr"><div class="fg"><label for="fzip">ZIP<span class="req" aria-label="required">*</span></label><input id="fzip" name="zip" aria-required="true" required placeholder="24091" inputmode="numeric" autocomplete="postal-code" oninput="quoteShipping()"></div><div class="fg"></div></div>
         <button type="submit" class="btn btn-a btn-fw" id="continue-btn">Continue to Payment →</button>
       </form>
 
@@ -1700,12 +1700,30 @@ function renderCart(){
   var el=document.getElementById('citems');
   if(!cart.length){el.innerHTML='<div class="cem"><p>Your cart is empty.</p></div>';}
   else{el.innerHTML=cart.map(function(i){return'<div class="cit"><div class="citim" aria-hidden="true">'+i.icon+'</div><div><div class="citn">'+i.name+'</div><div class="cits">'+i.size+'</div><div class="citc"><button class="qb" onclick="sq(\''+i.id+'\','+(i.qty-1)+')" aria-label="Decrease quantity of '+i.name+'">−</button><span class="qv" aria-label="Quantity: '+i.qty+'">'+i.qty+'</span><button class="qb" onclick="sq(\''+i.id+'\','+(i.qty+1)+')" aria-label="Increase quantity of '+i.name+'">+</button><span class="rm" onclick="rem(\''+i.id+'\')" role="button" tabindex="0" aria-label="Remove '+i.name+' from cart">Remove</span></div></div><div class="cip">$'+(i.price*i.qty).toFixed(2)+'</div></div>';}).join('');}
-  var t=tot(),sh=8;
+  var t=tot();
   document.getElementById('csub').textContent='$'+t.toFixed(2);
-  document.getElementById('cship').textContent=sh===0?'FREE':'$'+sh.toFixed(2);
-  document.getElementById('ctot').textContent='$'+(t+sh).toFixed(2);
+  document.getElementById('cship').textContent='By ZIP at checkout';
+  document.getElementById('ctot').textContent='$'+t.toFixed(2)+' + shipping';
+  shipQuote=null;quoteShipping();
+  renderOrderLines();
+}
+// Shipping depends on weight and ZIP code; the server quotes it (same math as checkout).
+var shipQuote=null,shipQuoteKey='';
+function renderOrderLines(){
   var ol=document.getElementById('olines');if(!ol)return;
-  ol.innerHTML=cart.map(function(i){return'<div class="ol"><span>'+i.name+' × '+i.qty+'</span><span>$'+(i.price*i.qty).toFixed(2)+'</span></div>';}).join('')+'<div class="ol"><span>Shipping</span><span>'+(sh===0?'FREE':'$'+sh.toFixed(2))+'</span></div><div class="ol tot"><span>Subtotal + Shipping</span><span>$'+(t+sh).toFixed(2)+'</span></div>';
+  var t=tot(),sh=shipQuote&&shipQuote.shipping_cents!=null?shipQuote.shipping_cents/100:null;
+  var shTxt=sh!=null?'$'+sh.toFixed(2):(shipQuote&&shipQuote.error?shipQuote.error:'Enter ZIP below');
+  ol.innerHTML=cart.map(function(i){return'<div class="ol"><span>'+i.name+' × '+i.qty+'</span><span>$'+(i.price*i.qty).toFixed(2)+'</span></div>';}).join('')+'<div class="ol"><span>USPS Shipping</span><span>'+shTxt+'</span></div><div class="ol tot"><span>Subtotal + Shipping</span><span>'+(sh!=null?'$'+(t+sh).toFixed(2):'$'+t.toFixed(2)+' + shipping')+'</span></div>';
+}
+function quoteShipping(){
+  var z=document.getElementById('fzip');var zip=z?z.value.trim().slice(0,5):'';
+  if(!/^\d{5}$/.test(zip)||!cart.length){shipQuote=null;shipQuoteKey='';renderOrderLines();return;}
+  var payload={cart:cart.map(function(i){return{id:i.id,qty:i.qty};}),postal_code:zip};
+  var key=JSON.stringify(payload);if(key===shipQuoteKey)return;shipQuoteKey=key;
+  fetch('/api/shipping-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:key})
+    .then(function(r){return r.json();})
+    .then(function(d){if(key!==shipQuoteKey)return;shipQuote=d.error?{error:d.error}:d;renderOrderLines();})
+    .catch(function(){if(key!==shipQuoteKey)return;shipQuote=null;renderOrderLines();});
 }
 function openCart(){document.getElementById('cov').classList.add('on');var p=document.getElementById('cpanel');p.classList.add('on');setTimeout(function(){var cx=p.querySelector('.cx');if(cx)cx.focus();},50);}
 function closeCart(){document.getElementById('cov').classList.remove('on');document.getElementById('cpanel').classList.remove('on');var btn=document.querySelector('.cbtn');if(btn)btn.focus();}
@@ -1767,7 +1785,7 @@ async function goToPayment(e){
 
     currentOrderId=data.orderId;
     document.getElementById('sum-subtotal').textContent='$'+(data.amount.subtotal_cents/100).toFixed(2);
-    document.getElementById('sum-shipping').textContent=data.amount.shipping_cents===0?'FREE':'$'+(data.amount.shipping_cents/100).toFixed(2);
+    document.getElementById('sum-shipping').textContent='$'+(data.amount.shipping_cents/100).toFixed(2);
     document.getElementById('sum-tax').textContent='$'+(data.amount.tax_cents/100).toFixed(2);
     document.getElementById('sum-total').textContent='$'+(data.amount.total_cents/100).toFixed(2);
     document.getElementById('pay-amount').textContent='$'+(data.amount.total_cents/100).toFixed(2);

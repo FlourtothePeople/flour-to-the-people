@@ -14,7 +14,7 @@
 //     orderId: 'pi_...',
 //     amount: {
 //       subtotal_cents: 2400,
-//       shipping_cents: 800,
+//       shipping_cents: 928,   // cheapest USPS Click-N-Ship option to this ZIP
 //       tax_cents: 24,     // 1% of subtotal for Virginia addresses, else 0
 //       total_cents: 3424,
 //     }
@@ -22,7 +22,8 @@
 //
 // Errors return: { error: 'human-readable message' }, HTTP 400 or 500.
 
-import { validateCart, calculateShippingCents, calculateTaxCents, ORDER_MIN_CENTS, ORDER_MAX_CENTS } from '../_lib/products.js';
+import { validateCart, calculateTaxCents, ORDER_MIN_CENTS, ORDER_MAX_CENTS } from '../_lib/products.js';
+import { calculateShipping } from '../_lib/shipping.js';
 import { createCustomer, createPaymentIntent, retrievePaymentIntent } from '../_lib/stripe.js';
 
 export async function onRequestPost({ request, env }) {
@@ -62,8 +63,14 @@ export async function onRequestPost({ request, env }) {
     return jsonResponse({ error: e.message }, 400);
   }
 
-  const { lineItems, subtotal_cents } = cartValidation;
-  const shipping_cents = calculateShippingCents(subtotal_cents);
+  const { lineItems, subtotal_cents, total_weight_oz } = cartValidation;
+  let shipping;
+  try {
+    shipping = calculateShipping(total_weight_oz, address.postal_code);
+  } catch (e) {
+    return jsonResponse({ error: e.message }, 400);
+  }
+  const shipping_cents = shipping.cents;
   const pre_tax_cents = subtotal_cents + shipping_cents;
 
   if (pre_tax_cents < ORDER_MIN_CENTS) {
@@ -122,6 +129,8 @@ export async function onRequestPost({ request, env }) {
         cart_items: JSON.stringify(lineItems),
         subtotal_cents: String(subtotal_cents),
         shipping_cents: String(shipping_cents),
+        shipping_method: shipping.method.slice(0, 500),
+        shipping_zone: String(shipping.zone),
         tax_cents: String(tax_cents),
       },
     });

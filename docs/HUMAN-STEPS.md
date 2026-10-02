@@ -52,5 +52,5 @@ The code does not compute sales tax (`docs/KNOWN-ISSUES.md`, issue 1). A person 
 ## H8. Go-live approval and the real test purchase
 
 1. The person approves going live after reading the eight steps in `AGENTS.md`, "Going live".
-2. The person buys the cheapest product (minimum total $17.00) with their own card on the live site.
+2. The person buys the cheapest product (about $17 with shipping to a nearby ZIP) with their own card on the live site.
 3. The person checks the Stripe Dashboard payment list, then refunds that payment in the Stripe Dashboard.

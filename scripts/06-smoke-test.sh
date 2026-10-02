@@ -34,7 +34,7 @@ if [ "$MODE" = test ]; then
   CODE="$(post '{"cart":[{"id":"ap","qty":1}],"email":"smoke-test@example.com","name":"Smoke Test",'"$ADDR"'}')"
   expect "valid cart creates a PaymentIntent (200)" 200 "$CODE"
   PI="$(jget orderId </tmp/fttp-smoke.json)"; TOTAL="$(jget amount.total_cents </tmp/fttp-smoke.json)"
-  expect "total = \$16.00 product + \$8.00 shipping + \$0.16 VA tax (2416 cents)" 2416 "$TOTAL"
+  expect "total = \$16.00 product + \$9.28 shipping (Ground Advantage 4 lb, zone 1) + \$0.16 VA tax (2544 cents)" 2544 "$TOTAL"
   if [ "$E2E" = 1 ] && [ -n "$PI" ]; then
     say "End-to-end payment with Stripe test card token"
     R="$(stripe_api POST "/v1/payment_intents/$PI/confirm" -d payment_method=pm_card_visa --data-urlencode return_url="https://example.com")"
@@ -45,7 +45,7 @@ if [ "$MODE" = test ]; then
       GOT="$(wr d1 execute "$D1_NAME" --remote --command "SELECT total_cents AS t FROM orders WHERE id='$PI'" --json 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const r=JSON.parse(s)[0].results;process.stdout.write(r.length?String(r[0].t):"")}catch(e){}})')"
       [ -n "$GOT" ] && break; sleep 5
     done
-    expect "order row appeared in D1 with total_cents" 2416 "$GOT"
+    expect "order row appeared in D1 with total_cents" 2544 "$GOT"
     wr d1 execute "$D1_NAME" --remote --command "DELETE FROM orders WHERE id='$PI'" --yes >/dev/null 2>&1 && ok "test order $PI removed from D1"
   fi
 elif [ "$MODE" = live ]; then

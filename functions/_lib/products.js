@@ -86,11 +86,7 @@ export function calculateTaxCents(subtotal_cents, state) {
   return isVirginia ? Math.round(subtotal_cents * VA_GROCERY_TAX_RATE) : 0;
 }
 
-// Flat $8 per order nationwide, no free-shipping threshold.
-// Returns shipping cost in cents.
-export function calculateShippingCents(subtotal_cents) {
-  return 800;
-}
+// Shipping is calculated from weight and ZIP code in functions/_lib/shipping.js.
 
 // Sanity bounds — reject orders outside these for fraud/abuse protection.
 export const ORDER_MIN_CENTS = 50;     // Stripe minimum

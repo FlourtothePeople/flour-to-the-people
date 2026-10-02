@@ -92,7 +92,7 @@ Write the answers into `.env.handoff` (never into a committed file).
 | `npm run check` | Prices in `public/index.html` equal prices in `functions/_lib/products.js` (21 products), and no px font-size below 12px. |
 | `npm run test:local` | `ALL LOCAL TESTS PASSED` (27 checks). Runs the real functions against a local database with fake Stripe keys and locally signed webhooks. Needs no accounts. |
 | `npm run smoke` | `SMOKE TEST PASSED` against the deployed site. |
-| `npm run smoke -- --e2e` | Test-mode payment reaches D1 with `total_cents` 2416 ($16.00 all-purpose + $8.00 shipping + $0.16 Virginia tax). |
+| `npm run smoke -- --e2e` | Test-mode payment reaches D1 with `total_cents` 2544 ($16.00 all-purpose + $9.28 shipping to 24091 + $0.16 Virginia tax). |
 | `npm run doctor` | Status report. |
 
 Run `npm install` once before `npm run dev`; Wrangler prints the local address when it starts. The scripts themselves call `npx wrangler@4` and need no install.
@@ -104,7 +104,7 @@ Run `npm install` once before `npm run dev`; Wrangler prints the local address w
 3. The human puts the `sk_live_` and `pk_live_` keys into `.env.handoff`. Stripe test and live endpoints are separate, so `scripts/03-stripe.sh` creates a new live endpoint and a new signing secret.
 4. `bash scripts/03-stripe.sh`, then `bash scripts/04-deploy.sh`.
 5. `bash scripts/06-smoke-test.sh` (read-only in live mode).
-6. The human buys the cheapest product with their own card (H8). The smallest order the site accepts is $17.00: one $9.00 item plus $8.00 shipping.
+6. The human buys the cheapest product with their own card (H8). The smallest order is about $17: one $9.00 item plus $7.99 shipping to a nearby ZIP.
 7. Confirm the order row exists in D1 and the payment appears in the Stripe Dashboard, then refund the purchase in the Stripe Dashboard. The `charge.refunded` webhook sets the order status to `refunded`.
 8. Change the `DOMAIN` DNS (H6), then run `bash scripts/05-domain.sh`.
 
@@ -113,7 +113,7 @@ Run `npm install` once before `npm run dev`; Wrangler prints the local address w
 - **Edit `public/index.html` directly.** It holds all page content, CSS, and JavaScript. Read `docs/SITE-CONVENTIONS.md` before changing appearance; it lists rules the original author enforced and designs that were tried and rejected.
 - **A product price lives in two places**: the `add({id:"ap",...,price:8,...})` button in `public/index.html` (what the customer sees) and `price_cents` in `functions/_lib/products.js` (what Stripe charges). Edit both, then run `npm run check`. The deploy workflow fails when they differ.
 - **Adding a product** needs a new entry in `products.js` (id, name, `price_cents`, size, `weight_oz`), a product card in `index.html` with the same id, and an image in `public/images/`.
-- **Shipping** is $8.00 flat on every order (`calculateShippingCents` in `products.js`). The order minimum is 50 cents and the maximum is $1,000.
+- **Shipping** is the cheapest USPS Click-N-Ship (commercial) price from Floyd to the customer's ZIP code: Ground Advantage by weight, or a Priority Mail Flat Rate envelope/box when the order fits (`functions/_lib/shipping.js`; `POST /api/shipping-quote` lets the checkout form show it live). The order's Stripe metadata records `shipping_method` and `shipping_zone`, so the mill knows which label to buy. When USPS changes prices (usually January and July) update the price table and zone chart in `shipping.js`; flat-rate box capacities (`maxBags`) and packaging weights are set there too. The order minimum is 50 cents and the maximum is $1,000.
 - **Deploy** by pushing to `main`. **Roll back** with `git revert <commit>` and a push; Cloudflare's dashboard also lists earlier deployments.
 - **Preview** locally with `npm install && npm run dev`. Local secrets go in `.dev.vars` (ignored by git), for example `STRIPE_SECRET_KEY=sk_test_...`.
 
