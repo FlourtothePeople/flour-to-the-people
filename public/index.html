@@ -1273,6 +1273,126 @@ ol.rc-list li::before {
 .lloc{font-family:var(--fh);font-size:14px;color:#A8A4A0;line-height:1.4;margin-top:3px;font-weight:400;}
 .cv-hours{font-family:var(--fh);font-size:14px;color:#A8A4A0;margin-top:4px;font-weight:400;line-height:1.4;}
 </style>
+<style id="theme-anarchist">
+/* ══ ANARCHIST THEME — union-hall wall: black wall, red and black flag colors,
+   paper posters wheatpasted on it, stencil lettering. Recipes and FAQs use
+   green and black. Remove this whole <style> block to return to the old look. ══ */
+@font-face{font-family:'FTP Stencil';src:url('fonts/stencil.woff') format('woff');font-weight:100 900;font-display:swap;}
+@font-face{font-family:'FTP Body';src:url('fonts/atkinson.woff') format('woff');font-weight:200 800;font-display:swap;}
+:root{
+  --r:#D7001F; --g:#1F8A3A; --k:#000; --k2:#000; --k3:#0c0c0c;
+  --paper:#E7E5E0; --wall:#000;
+  --fd:'FTP Stencil',Impact,'Arial Narrow',sans-serif;
+  --fb:'FTP Body',Verdana,sans-serif; --fc:'FTP Body',Verdana,sans-serif; --fh:'FTP Body',Verdana,sans-serif;
+  --w:var(--paper);
+}
+body{background:var(--wall);}
+*{animation-name:none !important;}
+
+/* Top bar: one black strip, stencil words, the current page is a solid flag block */
+.topbar{background:#000;border-bottom:4px solid var(--r);padding:0 8px;gap:8px;height:clamp(50px,6.2vh,66px);}
+.topbar:has(.tab.g.on){border-bottom-color:var(--g);}
+.topbar-nav{gap:0;}
+.topbar-nav .tab,.topbar-nav .tab:not(.on){
+  border:none !important;border-radius:0;background:transparent;filter:none;
+  color:var(--paper) !important;font-family:var(--fd) !important;font-weight:800 !important;
+  font-size:max(19px,min(4.6vh,3.3vw)) !important;letter-spacing:.05em !important;padding:0 .4em !important;
+}
+.topbar-nav .tab:hover:not(.on){color:var(--r) !important;filter:none;}
+.topbar-nav .tab.on{background:var(--r) !important;color:#000 !important;font-weight:900 !important;}
+.topbar-nav .tab.g.on{background:var(--g) !important;}
+.topbar > .cbtn{
+  background:transparent !important;border:2px solid var(--paper) !important;color:var(--paper) !important;
+  border-radius:0;font-family:var(--fd) !important;font-weight:800 !important;letter-spacing:.06em;
+  font-size:max(18px,min(4.2vh,3vw)) !important;margin:7px 0;min-height:0;
+}
+.topbar > .cbtn:hover{background:var(--paper) !important;color:#000 !important;}
+.topbar > .cbtn:hover .cart-num,.topbar > .cbtn:hover .cart-sep{color:#000;}
+.topbar > .cbtn .cart-num{color:var(--paper);filter:none;}
+.topbar > .cbtn .cart-sep{color:var(--paper);opacity:.5;}
+
+/* Hero: banner stays; the tagline becomes a red stencil line */
+.hero{background:#000;}
+.hero-banner{box-shadow:none;}
+.hero .htag{color:var(--r);font-family:var(--fd);font-weight:800;font-size:clamp(20px,2.4vw,28px) !important;letter-spacing:.06em;}
+.hero-text .htag::before,.hero-text .htag::after{background:var(--r);height:4px;width:36px;}
+.hero .hero-sub{color:var(--paper);font-size:18px;line-height:1.5;max-width:58ch;}
+
+/* Points of unity: square black blocks, solid flag-color headings */
+.manifesto-item{border-radius:0;background:#000;border:2px solid var(--ac,var(--r));box-shadow:none;}
+.manifesto-item:hover{box-shadow:none;}
+.manifesto.faq-mode{--ac:var(--g);}
+.manifesto-head{
+  background:var(--ac,var(--r));color:#000;font-family:var(--fd);font-weight:900;
+  font-size:clamp(22px,7cqw,32px);letter-spacing:.04em;text-shadow:none;padding:9px 44px 7px;
+}
+.manifesto.faq-mode .manifesto-head,.manifesto.recipe-mode .manifesto-head{color:#000;text-shadow:none;}
+.manifesto-head::after{color:#000;opacity:.8;}
+.manifesto-body{background:#000;color:var(--paper);font-size:17px;line-height:1.45;}
+.manifesto-body strong{color:#fff;}
+
+/* Filters: rubber-stamp blocks; the chosen one is inked red */
+.filters{gap:8px !important;}
+.filters .fb{
+  background:transparent !important;color:var(--paper) !important;border:2px solid var(--paper) !important;
+  border-radius:0 !important;font-family:var(--fd) !important;font-weight:800 !important;
+  font-size:max(18px,min(3.6vh,2.4vw)) !important;letter-spacing:.05em;padding:0 .55em !important;
+}
+.filters .fb:hover:not(.on){background:var(--paper) !important;color:#000 !important;filter:none;}
+.filters .fb.on{background:var(--r) !important;border-color:var(--r) !important;color:#000 !important;font-weight:900 !important;}
+
+/* Products: paper posters pasted on the wall, each a little crooked */
+.pgrid{gap:26px 22px;background:transparent;padding:4px 6px 12px;}
+.pc{
+  border:none !important;border-radius:0 !important;box-shadow:0 2px 0 rgba(0,0,0,.4) !important;
+  background-color:var(--paper) !important;color:#000;transform:rotate(-.7deg);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.pc:nth-child(2n){transform:rotate(.55deg);}
+.pc:nth-child(3n){transform:rotate(-.3deg);}
+.pc:nth-child(5n){transform:rotate(.9deg);}
+.pci{border-bottom:3px solid #000;background:#000;}
+.pci img{filter:contrast(1.05) saturate(.92);}
+.pcb{padding:14px 16px 16px;}
+.pcb h3{font-family:var(--fd) !important;font-weight:900 !important;font-size:clamp(28px,2.7vw,34px) !important;color:#000 !important;letter-spacing:.01em !important;line-height:.95;text-transform:uppercase;margin-bottom:8px;}
+.pcb p{color:#1b1b1b !important;font-size:15px !important;line-height:1.5 !important;}
+.pcb p strong{color:#000 !important;}
+.pcf{border-top:2px dashed #000;padding-top:10px;}
+.price{color:#000 !important;text-shadow:none !important;font-family:var(--fd) !important;font-weight:900;font-size:2.1rem !important;letter-spacing:.02em;}
+.pc .sz{color:#333 !important;}
+.atc{
+  background:#000 !important;color:var(--paper) !important;border-radius:0;
+  font-family:var(--fd) !important;font-weight:800 !important;font-size:20px !important;letter-spacing:.05em;padding:0 18px !important;
+}
+.atc:hover{background:var(--r) !important;color:#000 !important;}
+.atc:focus-visible{outline:3px solid var(--r);outline-offset:2px;}
+.badge{background:var(--r) !important;color:#000 !important;font-family:var(--fd) !important;font-weight:900 !important;font-size:16px !important;letter-spacing:.06em;border-radius:0;padding:3px 9px !important;}
+.badge-a{background:#000 !important;color:var(--paper) !important;}
+
+/* Page headings, footer, cart, checkout: square corners, stencil headings */
+.ph h1,h2,.logo,.chd h3,.mhd h3,.ctot,.sscr h3,.fw h3{font-family:var(--fd);font-weight:900;letter-spacing:.02em;}
+.footer{border-top:4px solid var(--r);}
+.logo{font-size:2rem;}
+.cpanel,.modal{border-radius:0;}
+.modal{border-top:4px solid var(--r);}
+.btn,.btn-a{border-radius:0;font-family:var(--fd);font-weight:800;font-size:19px !important;letter-spacing:.05em;}
+.toast{background:var(--r);color:#000 !important;font-family:var(--fd);font-weight:800;font-size:18px;}
+
+.manifesto.faq-mode .manifesto-head{font-family:var(--fb) !important;font-weight:700 !important;font-size:18px !important;letter-spacing:0 !important;text-transform:none;}
+.manifesto-head{overflow-wrap:normal;word-break:normal;hyphens:none;}
+@media (max-width:600px){
+  .pc,.pc:nth-child(n){transform:rotate(-.4deg);}
+  .manifesto-head{font-size:21px !important;padding:8px 30px 6px 10px !important;}
+  .hero .htag{font-size:19px !important;letter-spacing:.03em;}
+  .pc:nth-child(2n){transform:rotate(.4deg);}
+  .pcb h3{font-size:30px !important;}
+}
+@media (max-width:480px){
+  .topbar{padding:0 4px;gap:4px;}
+  .topbar-nav .tab,.topbar-nav .tab:not(.on){font-size:17px !important;padding:0 .25em !important;letter-spacing:.02em !important;}
+  .topbar > .cbtn{font-size:16px !important;padding:0 .35em !important;}
+}
+</style>
 </head>
 <body>
 <a href="#scroll" class="skip-nav">Skip to main content</a>
