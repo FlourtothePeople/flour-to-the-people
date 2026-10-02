@@ -72,6 +72,20 @@ export function validateCart(cart) {
   return { lineItems, subtotal_cents, total_weight_oz };
 }
 
+// Sales tax: Virginia taxes "food for home consumption" at a reduced 1% statewide
+// (Virginia Tax, tax.virginia.gov/grocery-tax). Every product above is a grocery
+// staple, so orders shipped to Virginia pay 1% of the item subtotal. Shipping is
+// listed separately on the order and is not taxed. Orders shipped to other
+// states pay no tax (the mill is below other states' registration thresholds).
+// If a non-food product is ever added, this must change.
+export const VA_GROCERY_TAX_RATE = 0.01;
+
+export function calculateTaxCents(subtotal_cents, state) {
+  const s = String(state || '').trim().toUpperCase();
+  const isVirginia = s === 'VA' || s === 'VIRGINIA';
+  return isVirginia ? Math.round(subtotal_cents * VA_GROCERY_TAX_RATE) : 0;
+}
+
 // Flat $8 nationwide, free over $50 subtotal.
 // Returns shipping cost in cents.
 export function calculateShippingCents(subtotal_cents) {

@@ -2,12 +2,12 @@
 
 Each entry states what happens, how it was found, and what to change.
 
-## 1. Tax is never charged, and `STRIPE_TAX_ENABLED` has no effect
+## 1. Tax: resolved October 2, 2026 with a flat Virginia grocery rate
 
-- `functions/api/checkout.js` sets `tax_cents = 0` for every order and says in a comment that the Tax Calculation flow is planned for a later phase.
-- `functions/api/config.js` returns `taxEnabled` to the browser, but `public/index.html` never reads it.
-- `SETUP.md` step 6 and its failure-mode list describe the flag as switching tax on; it does not.
-- To collect tax, implement Stripe's Tax Calculation API (`/v1/tax/calculations`, then the PaymentIntent, then `/v1/tax/transactions`) in `checkout.js` and the webhook. The decision whether to collect tax is H7.
+- `functions/_lib/products.js` `calculateTaxCents` charges 1% of the item subtotal when the shipping state is Virginia (`VA` or `Virginia`) and 0 elsewhere. Virginia taxes food for home consumption at a reduced 1% statewide (https://www.tax.virginia.gov/grocery-tax), and every product is a grocery staple. Shipping is listed separately and is not taxed.
+- `functions/api/checkout.js` adds the tax to the PaymentIntent amount and records it in `metadata.tax_cents`; the webhook stores it in the `tax_cents` column.
+- `STRIPE_TAX_ENABLED` and `/api/config` `taxEnabled` still have no effect; Stripe Tax is not used.
+- Revisit if a non-food product is added, or if sales into another state approach that state's registration threshold (then consider Stripe Tax's Tax Calculation API). An accountant should confirm the Virginia registration and filing.
 
 ## 2. `SETUP.md` step 8 asks for a $0.50 test purchase, which the site cannot accept
 

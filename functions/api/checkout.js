@@ -15,14 +15,14 @@
 //     amount: {
 //       subtotal_cents: 2400,
 //       shipping_cents: 800,
-//       tax_cents: 224,    // computed by Stripe Tax
+//       tax_cents: 24,     // 1% of subtotal for Virginia addresses, else 0
 //       total_cents: 3424,
 //     }
 //   }
 //
 // Errors return: { error: 'human-readable message' }, HTTP 400 or 500.
 
-import { validateCart, calculateShippingCents, ORDER_MIN_CENTS, ORDER_MAX_CENTS } from '../_lib/products.js';
+import { validateCart, calculateShippingCents, calculateTaxCents, ORDER_MIN_CENTS, ORDER_MAX_CENTS } from '../_lib/products.js';
 import { createCustomer, createPaymentIntent, retrievePaymentIntent } from '../_lib/stripe.js';
 
 export async function onRequestPost({ request, env }) {
@@ -93,16 +93,16 @@ export async function onRequestPost({ request, env }) {
     return jsonResponse({ error: 'Failed to create customer record' }, 500);
   }
 
+  // --- Sales tax ---
+  // 1% Virginia grocery rate on the item subtotal for Virginia addresses, else 0.
+  // See calculateTaxCents in functions/_lib/products.js.
+  const tax_cents = calculateTaxCents(subtotal_cents, address.state);
+
   // --- Create PaymentIntent ---
-  // Note: Stripe Tax with Payment Element requires the Tax Calculation API
-  // (/v1/tax/calculations -> /v1/payment_intents -> /v1/tax/transactions),
-  // NOT the automatic_tax param (that's Checkout Sessions only). For now we
-  // ship without tax; Phase 2 will implement the Tax Calculation flow when
-  // Stripe Tax is activated in the Dashboard.
   let intent;
   try {
     intent = await createPaymentIntent(env.STRIPE_SECRET_KEY, {
-      amount: pre_tax_cents,
+      amount: pre_tax_cents + tax_cents,
       currency: 'usd',
       customer: customer.id,
       automatic_payment_methods: { enabled: true },
@@ -122,6 +122,7 @@ export async function onRequestPost({ request, env }) {
         cart_items: JSON.stringify(lineItems),
         subtotal_cents: String(subtotal_cents),
         shipping_cents: String(shipping_cents),
+        tax_cents: String(tax_cents),
       },
     });
   } catch (e) {
@@ -129,9 +130,7 @@ export async function onRequestPost({ request, env }) {
     return jsonResponse({ error: 'Failed to initialize payment' }, 500);
   }
 
-  // Tax is $0 until Stripe Tax is activated and the Tax Calculation flow is wired.
   const total_cents = intent.amount;
-  const tax_cents = 0;
 
   return jsonResponse({
     clientSecret: intent.client_secret,
