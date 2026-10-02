@@ -92,7 +92,7 @@ Write the answers into `.env.handoff` (never into a committed file).
 | `npm run check` | Prices in `public/index.html` equal prices in `functions/_lib/products.js` (21 products), and no px font-size below 12px. |
 | `npm run test:local` | `ALL LOCAL TESTS PASSED` (27 checks). Runs the real functions against a local database with fake Stripe keys and locally signed webhooks. Needs no accounts. |
 | `npm run smoke` | `SMOKE TEST PASSED` against the deployed site. |
-| `npm run smoke -- --e2e` | Test-mode payment reaches D1 with `total_cents` 1600. |
+| `npm run smoke -- --e2e` | Test-mode payment reaches D1 with `total_cents` 2416 ($16.00 all-purpose + $8.00 shipping + $0.16 Virginia tax). |
 | `npm run doctor` | Status report. |
 
 Run `npm install` once before `npm run dev`; Wrangler prints the local address when it starts. The scripts themselves call `npx wrangler@4` and need no install.
