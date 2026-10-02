@@ -1013,8 +1013,26 @@ html, body { height: 100vh; overflow: hidden; }
   }
   .topbar > .cbtn .cart-sep { margin: 0 .1em; }
 }
+/* Six tabs (Bulk added): tab text scales with the window so the last tab never
+   runs under the cart button, down to the 12px floor on phones. */
+.topbar-nav .tab { font-size: max(12px, min(4vh, 2.3vw)) !important; padding: 0 .3em !important; }
+@media (max-width: 480px) {
+  .topbar-nav .tab { font-size: 12px !important; letter-spacing: 0 !important; padding: 0 .1em !important; }
+}
 @media (max-width: 380px) {
-  /* Very narrow: drop the dollar total — keep CART + count only, full total visible inside cart panel */
+  .topbar { padding: 4px 3px; gap: 3px; }
+  .topbar-nav { gap: 1px; }
+  .topbar > .cbtn { padding: 0 .3em !important; letter-spacing: 0; }
+}
+@media (max-width: 340px) {
+  /* Smallest phones: show a cart icon instead of the word CART */
+  .topbar > .cbtn .cart-word { display: none; }
+  .topbar > .cbtn::before { content: "🛒"; margin-right: 1px; }
+  .topbar > .cbtn { gap: 0 !important; padding: 0 .2em !important; }
+  .topbar { gap: 2px; padding: 4px 2px; }
+}
+@media (max-width: 430px) {
+  /* Narrow phones: drop the dollar total — keep CART + count only, full total visible inside cart panel */
   .topbar > .cbtn .cart-sep,
   .topbar > .cbtn #cb-total { display: none; }
 }
@@ -1281,11 +1299,12 @@ ol.rc-list li::before {
   <nav class="topbar-nav" aria-label="Main navigation">
     <div class="tab on" onclick="go('home',this,false)" role="link" tabindex="0">Home</div>
     <div class="tab" onclick="scrollToFlours()" role="link" tabindex="0">Shop</div>
+    <div class="tab" onclick="go('bulk',this,false)" role="link" tabindex="0">Bulk</div>
     <div class="tab g" onclick="go('recipes',this,true)" role="link" tabindex="0">Recipes</div>
     <div class="tab g" onclick="go('faqs',this,true)" role="link" tabindex="0">FAQs</div>
     <div class="tab" onclick="go('contact',this,false)" role="link" tabindex="0">Contact</div>
   </nav>
-  <button class="cbtn" onclick="openCart()" aria-label="Open cart">CART <span class="cart-num" id="cb-count">0</span><span class="cart-sep">│</span><span class="cart-num" id="cb-total">$0</span></button>
+  <button class="cbtn" onclick="openCart()" aria-label="Open cart"><span class="cart-word">CART </span><span class="cart-num" id="cb-count">0</span><span class="cart-sep">│</span><span class="cart-num" id="cb-total">$0</span></button>
 </header>
 <div class="scroll" id="scroll" role="main" aria-label="Site content">
 
@@ -1352,7 +1371,7 @@ ol.rc-list li::before {
     <tr><td><div class="ln">Roanoke Co+op</div><div class="lloc">1319 Grandin Rd SW</div></td><td>Daily 7am–9pm</td></tr>
   </tbody></table>
 </div>
-<footer class="footer" style="--ac:var(--r)"><div class="fg2"><div class="fb2"><div class="logo">Flour to the People<small style="color:var(--r)">Worker-Owned · Appalachia</small></div><p>Stone-milled organic flour from a worker-owned mill in the Southern Blue Ridge.</p></div><div class="fc"><h5 style="color:var(--r)">Navigate</h5><ul><li><a>Home</a></li><li><a onclick="scrollToFlours()">Shop</a></li><li><a onclick="go('recipes',tabs[2],true)">Recipes</a></li></ul></div><div class="fc"><h5 style="color:var(--r)">Contact</h5><address>708 Thompson Rd SE<br>Floyd, VA 24091<br>(276) 340-0288<br>FlourtothePeople@protonmail.com</address></div></div><div class="fbot"><span>© 2025 Flour to the People</span><span>Whole grain · Stone-milled</span></div></footer>
+<footer class="footer" style="--ac:var(--r)"><div class="fg2"><div class="fb2"><div class="logo">Flour to the People<small style="color:var(--r)">Worker-Owned · Appalachia</small></div><p>Stone-milled organic flour from a worker-owned mill in the Southern Blue Ridge.</p></div><div class="fc"><h5 style="color:var(--r)">Navigate</h5><ul><li><a>Home</a></li><li><a onclick="scrollToFlours()">Shop</a></li><li><a onclick="go('bulk',tabs[2],false)">Bulk</a></li><li><a onclick="go('recipes',tabs[3],true)">Recipes</a></li></ul></div><div class="fc"><h5 style="color:var(--r)">Contact</h5><address>708 Thompson Rd SE<br>Floyd, VA 24091<br>(276) 340-0288<br>FlourtothePeople@protonmail.com</address></div></div><div class="fbot"><span>© 2025 Flour to the People</span><span>Whole grain · Stone-milled</span></div></footer>
 </div>
 
 <!-- RECIPES (green) -->
@@ -1507,6 +1526,20 @@ ol.rc-list li::before {
         <p>If you don’t finish the loaf in one or two days, wrap it well and freeze it for another time. This gluten-free artisan bread also makes wonderful toast the next morning, and you can use up the remaining dough over the next 10 days. All your subsequent loaves are made from pre-mixed, stored dough that will develop sourdough flavors as it ages.</p>
       </div>
     </div>
+  </div>
+</div></div></div>
+
+<!-- BULK -->
+<div class="pg" id="pg-bulk">
+<div class="ph" style="border-bottom-color:var(--r)"><span class="ptag" style="color:var(--r)">Wholesale · Bakeries · Buying Clubs</span><h1>25 lb Bulk Bags</h1><p>Our stone-milled organic flours in 25 lb bags, for bakeries, restaurants, co-ops, buying clubs, and serious home bakers.</p></div>
+<div class="sec"><div class="cgrid">
+  <div class="cinfo"><h2 style="margin-bottom:10px;font-size:1.5rem;">Pricing by Inquiry</h2>
+    <p style="margin-bottom:14px;">Bulk pricing depends on the grain and the quantity. Email us with the products and how many 25 lb bags you need, and we'll reply with pricing and availability.</p>
+    <a class="btn btn-a" style="background:var(--r);border-color:var(--r);white-space:normal;max-width:100%;letter-spacing:.06em" href="mailto:FlourtothePeople@protonmail.com?subject=25%20lb%20bulk%20pricing%20inquiry">Email for Bulk Pricing →</a>
+  </div>
+  <div class="cinfo">
+    <div class="ci"><div class="cico">✉</div><div><div class="clbl" style="color:var(--r)">Email</div><div class="cv" style="overflow-wrap:anywhere"><a href="mailto:FlourtothePeople@protonmail.com?subject=25%20lb%20bulk%20pricing%20inquiry" style="color:inherit">FlourtothePeople@protonmail.com</a></div></div></div>
+    <div class="ci"><div class="cico">🌾</div><div><div class="clbl" style="color:var(--r)">Include in Your Email</div><div class="cv">Which flours, meals, or grits · How many 25 lb bags · How often (one-time or recurring) · Pickup in Floyd or shipping, with ZIP code</div></div></div>
   </div>
 </div></div></div>
 
