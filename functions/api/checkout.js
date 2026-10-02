@@ -113,6 +113,12 @@ export async function onRequestPost({ request, env }) {
       currency: 'usd',
       customer: customer.id,
       automatic_payment_methods: { enabled: true },
+      // Hold, don't charge: the mill confirms stock, then captures the payment in
+      // the Stripe Dashboard (Payments > Uncaptured > Capture), or cancels it to
+      // release the hold. Stripe only offers payment methods that support holds
+      // (cards, Apple Pay, Google Pay, Link, Klarna, Afterpay, Affirm; not ACH).
+      // Card holds expire after about 5 days (Visa) to 7 days (others).
+      capture_method: 'manual',
       shipping: {
         name: name.trim(),
         address: {

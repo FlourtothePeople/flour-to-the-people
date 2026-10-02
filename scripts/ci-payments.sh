@@ -57,6 +57,8 @@ if [ -z "$EXISTING" ]; then
     -d "enabled_events[]=payment_intent.succeeded" \
     -d "enabled_events[]=payment_intent.payment_failed" \
     -d "enabled_events[]=charge.refunded" \
+    -d "enabled_events[]=payment_intent.amount_capturable_updated" \
+    -d "enabled_events[]=payment_intent.canceled" \
     -d description="Flour to the People orders")"
   NEW_ID="$(echo "$RESP" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);if(j.error){console.error(j.error.message);process.exit(1)};process.stdout.write(j.id)})')"
   WHSEC="$(echo "$RESP" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.parse(s).secret))')"
@@ -64,6 +66,14 @@ if [ -z "$EXISTING" ]; then
   node -e 'require("fs").writeFileSync(process.argv[1],JSON.stringify({STRIPE_SECRET_KEY:process.env.STRIPE_SECRET_KEY,STRIPE_PUBLISHABLE_KEY:process.env.STRIPE_PUBLISHABLE_KEY,STRIPE_TAX_ENABLED:"false",STRIPE_WEBHOOK_SECRET:process.argv[2]}))' "$SECRETS" "$WHSEC"
 else
   echo "Webhook endpoint for this mode already exists ($EXISTING); keeping its signing secret"
+  # Keep its event list current (card holds need amount_capturable_updated and canceled).
+  curl -sS -u "$STRIPE_SECRET_KEY:" "https://api.stripe.com/v1/webhook_endpoints/$EXISTING" \
+    -d "enabled_events[]=payment_intent.succeeded" \
+    -d "enabled_events[]=payment_intent.payment_failed" \
+    -d "enabled_events[]=charge.refunded" \
+    -d "enabled_events[]=payment_intent.amount_capturable_updated" \
+    -d "enabled_events[]=payment_intent.canceled" \
+    | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);if(j.error){console.error("::error::Updating webhook events failed: "+j.error.message);process.exit(1)};console.log("Webhook events: "+j.enabled_events.join(", "))})'
   node -e 'require("fs").writeFileSync(process.argv[1],JSON.stringify({STRIPE_SECRET_KEY:process.env.STRIPE_SECRET_KEY,STRIPE_PUBLISHABLE_KEY:process.env.STRIPE_PUBLISHABLE_KEY,STRIPE_TAX_ENABLED:"false"}))' "$SECRETS"
 fi
 if ! $WR pages secret bulk "$SECRETS" --project-name="$PROJECT" >/dev/null; then

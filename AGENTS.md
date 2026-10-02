@@ -20,7 +20,7 @@ Read this file completely before running any command. It applies to any coding a
 | `public/images/` | 19 photos referenced from `index.html` as `images/...`. |
 | `functions/api/config.js` | `GET /api/config` returns the Stripe publishable key to the browser. |
 | `functions/api/checkout.js` | `POST /api/checkout` validates the cart against `functions/_lib/products.js`, then creates a Stripe Customer and PaymentIntent. |
-| `functions/api/stripe-webhook.js` | `POST /api/stripe-webhook` verifies Stripe's signature, inserts the order into D1, and records refunds. |
+| `functions/api/stripe-webhook.js` | `POST /api/stripe-webhook` verifies Stripe's signature, records the order in D1 when the card hold is placed, updates it when the mill captures or cancels, and records refunds. |
 | `functions/_lib/` | `products.js` (server prices), `stripe.js` (Stripe REST calls), `webhook.js` (signature check). |
 | `schema.sql` | D1 tables `orders` and `processed_events`. |
 | `wrangler.toml` | Pages configuration: output folder `public`, D1 binding `DB`. |
@@ -92,7 +92,7 @@ Write the answers into `.env.handoff` (never into a committed file).
 | `npm run check` | Prices in `public/index.html` equal prices in `functions/_lib/products.js` (21 products), and no px font-size below 12px. |
 | `npm run test:local` | `ALL LOCAL TESTS PASSED` (27 checks). Runs the real functions against a local database with fake Stripe keys and locally signed webhooks. Needs no accounts. |
 | `npm run smoke` | `SMOKE TEST PASSED` against the deployed site. |
-| `npm run smoke -- --e2e` | Test-mode payment reaches D1 with `total_cents` 2544 ($16.00 all-purpose + $9.28 shipping to 24091 + $0.16 Virginia tax). |
+| `npm run smoke -- --e2e` | Test-mode hold reaches D1 as `awaiting_approval`, then after capture as `pending`, with `total_cents` 2544 ($16.00 all-purpose + $9.28 shipping to 24091 + $0.16 Virginia tax). |
 | `npm run doctor` | Status report. |
 
 Run `npm install` once before `npm run dev`; Wrangler prints the local address when it starts. The scripts themselves call `npx wrangler@4` and need no install.
@@ -132,7 +132,14 @@ UPDATE orders SET fulfillment_status='shipped', shipped_at=strftime('%s','now'),
 WHERE id='<PAYMENT_INTENT_ID>';
 ```
 
-Statuses in use: `pending`, `shipped`, `refunded`, `partial_refund`. Stripe emails a receipt to the customer for live payments because the PaymentIntent sets `receipt_email`. Mill-side notification emails are a Stripe Dashboard setting (`SETUP.md`, "How the mill receives orders").
+**Payments are card holds, not immediate charges** (`capture_method: 'manual'` in `checkout.js`). Checkout authorizes the payment; the order appears in D1 as `awaiting_approval` and in the Stripe Dashboard under Payments as **Uncaptured**. The mill confirms stock, then in the Dashboard clicks **Capture** (full or a smaller amount if something is out of stock) or **Cancel** to release the hold. Holds expire after about 5 days (Visa) to 7 days (Mastercard, Amex, Discover); an expired hold cancels itself. ACH bank transfer cannot be held, so Stripe no longer offers it. Customers are told they will be emailed only if something is out of stock or delayed.
+
+```sql
+SELECT id, datetime(created_at,'unixepoch') AS placed, name, total_cents, items_json
+FROM orders WHERE fulfillment_status = 'awaiting_approval' ORDER BY created_at;
+```
+
+Statuses in use: `awaiting_approval` (hold placed, not charged), `pending` (charged, ready to ship), `shipped`, `canceled` (hold released), `refunded`, `partial_refund`. `total_cents` becomes the captured amount after a partial capture. Stripe emails a receipt to the customer for live payments because the PaymentIntent sets `receipt_email`. Mill-side notification emails are a Stripe Dashboard setting (`SETUP.md`, "How the mill receives orders").
 
 ## What was verified, tested, and left unverified
 

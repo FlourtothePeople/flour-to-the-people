@@ -61,10 +61,12 @@ Mark `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` as **encrypted** (the toggl
 Stripe Dashboard → Developers → Webhooks → "Add endpoint":
 
 - **Endpoint URL:** `https://flour-to-the-people.pages.dev/api/stripe-webhook`
-- **Events to send:** select these three:
+- **Events to send:** select these five:
   - `payment_intent.succeeded`
   - `payment_intent.payment_failed`
   - `charge.refunded`
+  - `payment_intent.amount_capturable_updated` (card hold placed)
+  - `payment_intent.canceled` (hold released or expired)
 - **API version:** latest
 - After creating, click the endpoint and reveal the **signing secret** (`whsec_...`)
 - Paste into `STRIPE_WEBHOOK_SECRET` in Cloudflare env vars

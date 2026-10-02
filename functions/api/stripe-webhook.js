@@ -1,8 +1,11 @@
 // POST /api/stripe-webhook
 //
 // Stripe posts events here. We verify the signature, then process the event.
-// The only event we care about today is payment_intent.succeeded — that's
-// the signal that money was captured and we should fulfill the order.
+// Payments are placed on hold (capture_method=manual, see checkout.js):
+//   payment_intent.amount_capturable_updated  card authorized -> order row, status 'awaiting_approval'
+//   payment_intent.succeeded                  mill captured   -> status 'pending' (ready to ship)
+//   payment_intent.canceled                   hold released   -> status 'canceled'
+//   charge.refunded                           refund          -> 'refunded' / 'partial_refund'
 //
 // Idempotency: every event has a unique event.id. We record processed event
 // IDs in D1 so retries from Stripe don't double-fulfill.
@@ -43,8 +46,20 @@ export async function onRequestPost({ request, env }) {
 
   try {
     switch (event.type) {
+      case 'payment_intent.amount_capturable_updated':
+        await upsertOrder(event.data.object, env, 'awaiting_approval');
+        break;
+
       case 'payment_intent.succeeded':
-        await handlePaymentSucceeded(event, env);
+        await upsertOrder(event.data.object, env, 'pending');
+        break;
+
+      case 'payment_intent.canceled':
+        if (env.DB) {
+          await env.DB.prepare(
+            "UPDATE orders SET fulfillment_status = 'canceled' WHERE id = ? AND fulfillment_status = 'awaiting_approval'"
+          ).bind(event.data.object.id).run();
+        }
         break;
 
       case 'payment_intent.payment_failed':
@@ -83,8 +98,10 @@ export async function onRequestPost({ request, env }) {
   return new Response(JSON.stringify({ received: true }), { status: 200 });
 }
 
-async function handlePaymentSucceeded(event, env) {
-  const pi = event.data.object;
+// Inserts the order, or moves an existing 'awaiting_approval' order to `status`.
+// Stripe may deliver events out of order, so a later state is never overwritten
+// by an earlier one (a captured order never goes back to awaiting_approval).
+async function upsertOrder(pi, env, status) {
 
   // Pull the shipping address from the PaymentIntent itself
   const shipping = pi.shipping || {};
@@ -113,10 +130,12 @@ async function handlePaymentSucceeded(event, env) {
     subtotal_cents: parseInt(pi.metadata?.subtotal_cents || '0', 10),
     shipping_cents: parseInt(pi.metadata?.shipping_cents || '0', 10),
     tax_cents: pi.amount - parseInt(pi.metadata?.subtotal_cents || '0', 10) - parseInt(pi.metadata?.shipping_cents || '0', 10),
-    total_cents: pi.amount,
+    // After a capture, amount_received is what was actually charged (the mill can
+    // capture less than the hold if something is out of stock).
+    total_cents: status === 'pending' && pi.amount_received ? pi.amount_received : pi.amount,
     currency: pi.currency,
     items_json: JSON.stringify(items),
-    fulfillment_status: 'pending',
+    fulfillment_status: status,
   };
 
   if (env.DB) {
@@ -127,6 +146,13 @@ async function handlePaymentSucceeded(event, env) {
         subtotal_cents, shipping_cents, tax_cents, total_cents, currency,
         items_json, fulfillment_status
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ON CONFLICT(id) DO UPDATE SET
+        fulfillment_status = CASE
+          WHEN orders.fulfillment_status = 'awaiting_approval' AND excluded.fulfillment_status = 'pending' THEN 'pending'
+          ELSE orders.fulfillment_status END,
+        total_cents = CASE
+          WHEN excluded.fulfillment_status = 'pending' THEN excluded.total_cents
+          ELSE orders.total_cents END
     `).bind(
       orderRow.id, orderRow.created_at, orderRow.email, orderRow.name,
       orderRow.address_line1, orderRow.address_line2, orderRow.city, orderRow.state, orderRow.postal_code, orderRow.country,

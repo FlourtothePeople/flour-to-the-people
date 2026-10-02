@@ -38,14 +38,16 @@ if [ "$MODE" = test ]; then
   if [ "$E2E" = 1 ] && [ -n "$PI" ]; then
     say "End-to-end payment with Stripe test card token"
     R="$(stripe_api POST "/v1/payment_intents/$PI/confirm" -d payment_method=pm_card_visa --data-urlencode return_url="https://example.com")"
-    expect "PaymentIntent status" succeeded "$(printf '%s' "$R" | jget status)"
-    info "waiting up to 60 seconds for the webhook to write the order to D1"
-    GOT=""
-    for _ in $(seq 1 12); do
-      GOT="$(wr d1 execute "$D1_NAME" --remote --command "SELECT total_cents AS t FROM orders WHERE id='$PI'" --json 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const r=JSON.parse(s)[0].results;process.stdout.write(r.length?String(r[0].t):"")}catch(e){}})')"
-      [ -n "$GOT" ] && break; sleep 5
-    done
-    expect "order row appeared in D1 with total_cents" 2544 "$GOT"
+    # Payments are holds (capture_method=manual): confirming authorizes, capturing charges.
+    expect "PaymentIntent status after confirm (card on hold)" requires_capture "$(printf '%s' "$R" | jget status)"
+    d1row() { wr d1 execute "$D1_NAME" --remote --command "SELECT fulfillment_status||':'||total_cents AS t FROM orders WHERE id='$PI'" --json 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const r=JSON.parse(s)[0].results;process.stdout.write(r.length?String(r[0].t):"")}catch(e){}})'; }
+    waitrow() { GOT=""; for _ in $(seq 1 12); do GOT="$(d1row)"; [ "$GOT" = "$1" ] && break; sleep 5; done; }
+    info "waiting up to 60 seconds for the webhook to record the order as awaiting approval"
+    waitrow "awaiting_approval:2544"; expect "order row in D1 after hold" "awaiting_approval:2544" "$GOT"
+    R="$(stripe_api POST "/v1/payment_intents/$PI/capture")"
+    expect "PaymentIntent status after capture" succeeded "$(printf '%s' "$R" | jget status)"
+    info "waiting up to 60 seconds for the webhook to mark the order ready to ship"
+    waitrow "pending:2544"; expect "order row in D1 after capture" "pending:2544" "$GOT"
     wr d1 execute "$D1_NAME" --remote --command "DELETE FROM orders WHERE id='$PI'" --yes >/dev/null 2>&1 && ok "test order $PI removed from D1"
   fi
 elif [ "$MODE" = live ]; then

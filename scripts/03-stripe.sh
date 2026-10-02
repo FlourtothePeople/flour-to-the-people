@@ -39,7 +39,9 @@ else
     --data-urlencode "description=Flour to the People orders ($MODE)" \
     --data-urlencode "enabled_events[]=payment_intent.succeeded" \
     --data-urlencode "enabled_events[]=payment_intent.payment_failed" \
-    --data-urlencode "enabled_events[]=charge.refunded")"
+    --data-urlencode "enabled_events[]=charge.refunded" \
+    --data-urlencode "enabled_events[]=payment_intent.amount_capturable_updated" \
+    --data-urlencode "enabled_events[]=payment_intent.canceled")"
   SECRET="$(printf '%s' "$RESP" | jget secret)"
   [ -n "$SECRET" ] || { printf '%s\n' "$RESP" | head -c 600; die "Stripe did not return a signing secret."; }
   set_env_var STRIPE_WEBHOOK_SECRET "$SECRET"; set_env_var STRIPE_WEBHOOK_SECRET_MODE "$MODE"

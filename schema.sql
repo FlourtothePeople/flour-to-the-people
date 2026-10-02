@@ -2,7 +2,7 @@
 -- Apply with: wrangler d1 execute flour-to-the-people-orders --file=schema.sql --remote
 --
 -- Two tables:
---   orders          — one row per successful payment
+--   orders          — one row per order (created when the card hold is placed)
 --   processed_events — webhook idempotency log (prevents double-fulfillment on Stripe retries)
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS orders (
   total_cents     INTEGER NOT NULL,
   currency        TEXT NOT NULL DEFAULT 'usd',
   items_json      TEXT NOT NULL,            -- serialized line items array
-  fulfillment_status TEXT NOT NULL DEFAULT 'pending',  -- pending | shipped | refunded | partial_refund
+  fulfillment_status TEXT NOT NULL DEFAULT 'pending',  -- awaiting_approval | pending | shipped | canceled | refunded | partial_refund
   shipped_at      INTEGER,
   refunded_at     INTEGER,
   tracking_number TEXT

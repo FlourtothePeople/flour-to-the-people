@@ -35,7 +35,7 @@ The "Send Message" button builds a `mailto:` link to FlourtothePeople@protonmail
 
 ## 8. Orders are recorded but nothing notifies the mill automatically
 
-The webhook writes each paid order to D1 with status `pending`. The code sends no email to the mill (the stubs for email, shipping labels, and stock counts are marked "Phase 2" in `stripe-webhook.js`). The mill learns about orders from Stripe Dashboard notification settings or by querying D1 (`AGENTS.md`, "Reading and fulfilling orders").
+The webhook writes each order to D1 with status `awaiting_approval` when the card hold is placed, and `pending` once the mill captures it in the Stripe Dashboard. The code sends no email to the mill (the stubs for email, shipping labels, and stock counts are marked "Phase 2" in `stripe-webhook.js`). The mill learns about orders from Stripe Dashboard notification settings or by querying D1 (`AGENTS.md`, "Reading and fulfilling orders").
 
 ## 9. `wrangler.toml` makes the file the source of truth for bindings
 
