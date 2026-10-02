@@ -11,7 +11,7 @@ export const PRODUCTS = {
   pz: { name: 'Pizza Dough Flour',     price_cents: 1200, size: '1.5 lb', weight_oz: 24 },
   pa: { name: 'Pastry Flour',          price_cents: 1200, size: '1.5 lb', weight_oz: 24 },
   pp: { name: 'Pumpernickel',          price_cents:  900, size: '1.5 lb', weight_oz: 24 },
-  km: { name: 'Kamut Flour',           price_cents: 1100, size: '1.5 lb', weight_oz: 24 },
+  km: { name: 'Khorasan Flour',        price_cents: 1100, size: '1.5 lb', weight_oz: 24 },
   sp: { name: 'Spelt Flour',           price_cents: 1200, size: '1.5 lb', weight_oz: 24 },
   ek: { name: 'Einkorn Flour',         price_cents: 1100, size: '1.5 lb', weight_oz: 24 },
   tf: { name: 'Teff Flour',            price_cents: 1200, size: '1.5 lb', weight_oz: 24 },
