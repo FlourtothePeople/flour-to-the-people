@@ -113,7 +113,7 @@ Run `npm install` once before `npm run dev`; Wrangler prints the local address w
 - **Edit `public/index.html` directly.** It holds all page content, CSS, and JavaScript. Read `docs/SITE-CONVENTIONS.md` before changing appearance; it lists rules the original author enforced and designs that were tried and rejected.
 - **A product price lives in two places**: the `add({id:"ap",...,price:8,...})` button in `public/index.html` (what the customer sees) and `price_cents` in `functions/_lib/products.js` (what Stripe charges). Edit both, then run `npm run check`. The deploy workflow fails when they differ.
 - **Adding a product** needs a new entry in `products.js` (id, name, `price_cents`, size, `weight_oz`), a product card in `index.html` with the same id, and an image in `public/images/`.
-- **Shipping** is $8.00 flat, free when the subtotal is above $50.00 (`calculateShippingCents` in `products.js`). The order minimum is 50 cents and the maximum is $1,000.
+- **Shipping** is $8.00 flat on every order (`calculateShippingCents` in `products.js`). The order minimum is 50 cents and the maximum is $1,000.
 - **Deploy** by pushing to `main`. **Roll back** with `git revert <commit>` and a push; Cloudflare's dashboard also lists earlier deployments.
 - **Preview** locally with `npm install && npm run dev`. Local secrets go in `.dev.vars` (ignored by git), for example `STRIPE_SECRET_KEY=sk_test_...`.
 

@@ -86,10 +86,10 @@ export function calculateTaxCents(subtotal_cents, state) {
   return isVirginia ? Math.round(subtotal_cents * VA_GROCERY_TAX_RATE) : 0;
 }
 
-// Flat $8 nationwide, free over $50 subtotal.
+// Flat $8 per order nationwide, no free-shipping threshold.
 // Returns shipping cost in cents.
 export function calculateShippingCents(subtotal_cents) {
-  return subtotal_cents > 5000 ? 0 : 800;
+  return 800;
 }
 
 // Sanity bounds — reject orders outside these for fraud/abuse protection.
