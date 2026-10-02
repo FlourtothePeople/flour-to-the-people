@@ -20,12 +20,12 @@ export const PRODUCTS = {
   ot: { name: 'Oat Flour',             price_cents: 1000, size: '1.5 lb', weight_oz: 24 },
   ml: { name: 'Millet Flour',          price_cents:  900, size: '1.5 lb', weight_oz: 24 },
   bw: { name: 'Buckwheat Pancake Mix', price_cents: 1200, size: '1.5 lb', weight_oz: 24 },
-  cm: { name: 'Corn Meal',             price_cents:  700, size: '1.5 lb', weight_oz: 24 },
-  cg: { name: 'Corn Grits',            price_cents:  700, size: '1.5 lb', weight_oz: 24 },
-  wcm: { name: 'White Corn Meal',      price_cents:  700, size: '1.5 lb', weight_oz: 24 },
-  wcg: { name: 'White Corn Grits',     price_cents:  700, size: '1.5 lb', weight_oz: 24 },
-  bcm: { name: 'Blue Corn Meal',       price_cents:  700, size: '1.5 lb', weight_oz: 24 },
-  bcg: { name: 'Blue Corn Grits',      price_cents:  700, size: '1.5 lb', weight_oz: 24 },
+  cm: { name: 'Corn Meal',             price_cents:  900, size: '1.5 lb', weight_oz: 24 },
+  cg: { name: 'Corn Grits',            price_cents:  900, size: '1.5 lb', weight_oz: 24 },
+  wcm: { name: 'White Corn Meal',      price_cents:  900, size: '1.5 lb', weight_oz: 24 },
+  wcg: { name: 'White Corn Grits',     price_cents:  900, size: '1.5 lb', weight_oz: 24 },
+  bcm: { name: 'Blue Corn Meal',       price_cents:  900, size: '1.5 lb', weight_oz: 24 },
+  bcg: { name: 'Blue Corn Grits',      price_cents:  900, size: '1.5 lb', weight_oz: 24 },
   so: { name: 'Scottish Oatmeal',      price_cents:  900, size: '1.5 lb', weight_oz: 24 },
 };
 

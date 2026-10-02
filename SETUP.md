@@ -1,6 +1,6 @@
 # Payment System Setup
 
-> **Automation and corrections (added for the handoff).** The scripts in `scripts/` perform steps 3, 4, and 5 below; see `AGENTS.md` for the order. Three statements in this guide are wrong for the current code: (1) `STRIPE_TAX_ENABLED` does not switch tax on, because checkout never computes tax (`docs/KNOWN-ISSUES.md`, issue 1); (2) the smallest order the site accepts is $15.00, so the "$0.50 test purchase" in step 8 cannot happen (issue 2); (3) `wrangler.toml` now defines the D1 binding, so skip the dashboard binding in step 3 (issue 9). The site files live in `public/`.
+> **Automation and corrections (added for the handoff).** The scripts in `scripts/` perform steps 3, 4, and 5 below; see `AGENTS.md` for the order. Three statements in this guide are wrong for the current code: (1) `STRIPE_TAX_ENABLED` does not switch tax on, because checkout never computes tax (`docs/KNOWN-ISSUES.md`, issue 1); (2) the smallest order the site accepts is $17.00, so the "$0.50 test purchase" in step 8 cannot happen (issue 2); (3) `wrangler.toml` now defines the D1 binding, so skip the dashboard binding in step 3 (issue 9). The site files live in `public/`.
 
 
 Once committed, the code in this repo is structurally complete but inert until you connect a Stripe account and configure environment variables. Walk through these steps in order — each one is gated on the previous.

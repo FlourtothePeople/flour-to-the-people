@@ -11,7 +11,7 @@ Each entry states what happens, how it was found, and what to change.
 
 ## 2. `SETUP.md` step 8 asks for a $0.50 test purchase, which the site cannot accept
 
-The cheapest product costs $7.00 and shipping is $8.00 below a $50.00 subtotal, so the smallest order is $15.00 (`ORDER_MIN_CENTS` is 50 cents, but the real minimum comes from the prices). Use a $15.00 purchase and refund it.
+The cheapest product costs $9.00 and shipping is $8.00 below a $50.00 subtotal, so the smallest order is $17.00 (`ORDER_MIN_CENTS` is 50 cents, but the real minimum comes from the prices). Use a $17.00 purchase and refund it.
 
 ## 3. Two database names appeared in the original files
 

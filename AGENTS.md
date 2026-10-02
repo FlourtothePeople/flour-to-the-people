@@ -104,7 +104,7 @@ Run `npm install` once before `npm run dev`; Wrangler prints the local address w
 3. The human puts the `sk_live_` and `pk_live_` keys into `.env.handoff`. Stripe test and live endpoints are separate, so `scripts/03-stripe.sh` creates a new live endpoint and a new signing secret.
 4. `bash scripts/03-stripe.sh`, then `bash scripts/04-deploy.sh`.
 5. `bash scripts/06-smoke-test.sh` (read-only in live mode).
-6. The human buys the cheapest product with their own card (H8). The smallest order the site accepts is $15.00: one $7.00 item plus $8.00 shipping.
+6. The human buys the cheapest product with their own card (H8). The smallest order the site accepts is $17.00: one $9.00 item plus $8.00 shipping.
 7. Confirm the order row exists in D1 and the payment appears in the Stripe Dashboard, then refund the purchase in the Stripe Dashboard. The `charge.refunded` webhook sets the order status to `refunded`.
 8. Change the `DOMAIN` DNS (H6), then run `bash scripts/05-domain.sh`.
 

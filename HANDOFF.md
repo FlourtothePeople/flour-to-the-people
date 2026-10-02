@@ -42,4 +42,4 @@ bash scripts/05-domain.sh
 
 ## What still needs your decision
 
-`docs/KNOWN-ISSUES.md` lists nine issues. The two that affect money: sales tax is never charged (issue 1), and `SETUP.md` asks for a $0.50 test purchase that the site cannot accept; the minimum order is $15.00 (issue 2).
+`docs/KNOWN-ISSUES.md` lists nine issues. The two that affect money: sales tax is never charged (issue 1), and `SETUP.md` asks for a $0.50 test purchase that the site cannot accept; the minimum order is $17.00 (issue 2).
