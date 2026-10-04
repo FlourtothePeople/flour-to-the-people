@@ -1,0 +1,25 @@
+name: Preview a design branch
+
+# Any branch other than main deploys to its own preview address,
+# https://<branch>.flour-to-the-people-5vp.pages.dev, and never touches the live site.
+# Preview deployments have no Stripe keys, so checkout does not work there.
+on:
+  push:
+    branches-ignore: [main]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check prices and font floor
+        run: node scripts/check-prices.mjs && node scripts/check-fonts.mjs
+      - name: Deploy preview
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name=flour-to-the-people --branch=${{ github.ref_name }}

@@ -1304,6 +1304,10 @@ ol.rc-list li::before {
 .lloc{font-family:var(--fh);font-size:14px;color:#A8A4A0;line-height:1.4;margin-top:3px;font-weight:400;}
 .cv-hours{font-family:var(--fh);font-size:14px;color:#A8A4A0;margin-top:4px;font-weight:400;line-height:1.4;}
 </style>
+<style>.hero-alt{display:flex;align-items:center;justify-content:center;gap:clamp(18px,4vw,48px);padding:28px 16px 4px;width:100%;max-width:1000px}
+.hero-alt img{width:min(380px,42vw);height:auto;border-radius:50%;aspect-ratio:1;object-fit:cover;object-position:50% 42%;border:4px solid #CC0000}
+.hero-title{font-family:'Bowlby One',Impact,sans-serif;font-size:clamp(40px,7vw,84px);line-height:.92;color:#F0EDE6;margin:0;letter-spacing:.01em}
+@media (max-width:600px){.hero-alt{flex-direction:column;text-align:center}.hero-alt img{width:min(260px,70vw)}}</style>
 </head>
 <body>
 <a href="#scroll" class="skip-nav">Skip to main content</a>
@@ -1324,7 +1328,7 @@ ol.rc-list li::before {
 <!-- HOME -->
 <div class="pg on" id="pg-home">
 <div class="hero" style="--ac:var(--r)">
-  <img class="hero-banner" src="images/img-000-602b7441.jpg" alt="Flour to the People — embroidered emblem with watermill, autumn Blue Ridge Mountains, wheat sheaves, fist holding a loaf, heritage corn, and a sack of organic stone-ground flour" loading="eager">
+  <div class="hero-alt"><h1 class="hero-title">Flour<br>to the<br>People</h1><img src="images/hero-emblem.jpg" alt="A raised fist holding a loaf of bread, framed by wheat"></div>
   <div class="hero-text">
     <div class="htag">Stone-Milled · Organic · Blue Ridge Mountains</div>
     <p class="hero-sub">A worker-owned mill in Appalachia. We stone-mill organic grains from local farms into fresh whole-grain flours that retain everything commercial milling strips away.</p>
