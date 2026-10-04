@@ -26,7 +26,8 @@ Follow these rules when changing `public/index.html`. Items marked "checked" are
 
 1. **Glass-gem corn photo as a tiled page background with a heavy black stroke on all text.** Three implementations failed to render cleanly: stacked `text-shadow` layers produced ghost outlines, a duplicate-text pseudo-element with `z-index:-1` disappeared behind ancestor stacking contexts, and a global `text-shadow` on `body` inherited into selected tabs and hid their black-on-red text. It was removed completely.
 2. **Muted earthy palette (umber, iron oxide, moss, oatmeal).** The author disliked it.
-3. **Red and black diagonal flag behind the hero.** Replaced by the full-width embroidered banner image `public/images/img-000-602b7441.jpg`.
+3. **Red and black diagonal flag behind the hero.** Replaced by an embroidered banner image, which was itself replaced in October 2026 (see 4).
+4. **AI-generated embroidered banner** (watermill, mountains, fist with loaf, flour sack). Removed in October 2026 because it read as AI-made: warped lettering on the sack, uniform "stitching", every inch filled. A linocut millstone seal, a red-ring logo (too close to the Arm & Hammer mark) and gold-wheat recolorings were also tried. The hero now shows the mill's own hand-drawn logo, black on cream (`public/images/hero-logo.png`, made from the owner's 5000 px scan), centered over dark-red sunburst rays drawn in CSS (`.hero-logo-wrap::before`). `public/images/share.jpg` is the same composition at 1200×630 for link previews.
 
 ## Working method the author expects
 
