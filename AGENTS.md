@@ -139,6 +139,8 @@ SELECT id, datetime(created_at,'unixepoch') AS placed, name, total_cents, items_
 FROM orders WHERE fulfillment_status = 'awaiting_approval' ORDER BY created_at;
 ```
 
+**Order alert emails.** When a hold is placed, the webhook emails the mill (to `ORDER_ALERT_TO`, default FlourtothePeople@protonmail.com) from orders@flourtothepeople.org through Proton SMTP (`functions/_lib/mailer.js`, smtp.protonmail.ch:587 STARTTLS). The Proton SMTP token is the GitHub secret `PROTON_SMTP_TOKEN`; `scripts/ci-payments.sh` copies it to the Pages secrets on every deploy. A failed email is logged and never blocks recording the order. To send a sample alert, run the deploy workflow by hand from the Actions tab (or push a commit whose message contains `[send test order alert]`); the result appears on the commit as the status "Order alert test". The domain's Proton DNS records (MX, SPF, three DKIM CNAMEs set to DNS only, DMARC) are in Cloudflare.
+
 Statuses in use: `awaiting_approval` (hold placed, not charged), `pending` (charged, ready to ship), `shipped`, `canceled` (hold released), `refunded`, `partial_refund`. `total_cents` becomes the captured amount after a partial capture. Stripe emails a receipt to the customer for live payments because the PaymentIntent sets `receipt_email`. Mill-side notification emails are a Stripe Dashboard setting (`SETUP.md`, "How the mill receives orders").
 
 ## What was verified, tested, and left unverified

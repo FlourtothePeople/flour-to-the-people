@@ -76,6 +76,14 @@ else
     | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);if(j.error){console.error("::error::Updating webhook events failed: "+j.error.message);process.exit(1)};console.log("Webhook events: "+j.enabled_events.join(", "))})'
   node -e 'require("fs").writeFileSync(process.argv[1],JSON.stringify({STRIPE_SECRET_KEY:process.env.STRIPE_SECRET_KEY,STRIPE_PUBLISHABLE_KEY:process.env.STRIPE_PUBLISHABLE_KEY,STRIPE_TAX_ENABLED:"false"}))' "$SECRETS"
 fi
+# Order alert emails (functions/_lib/mailer.js): the Proton SMTP token for
+# orders@flourtothepeople.org, from the GitHub secret PROTON_SMTP_TOKEN.
+if [ -n "${PROTON_SMTP_TOKEN:-}" ]; then
+  node -e 'const fs=require("fs"),f=process.argv[1],j=JSON.parse(fs.readFileSync(f));j.PROTON_SMTP_TOKEN=process.env.PROTON_SMTP_TOKEN;fs.writeFileSync(f,JSON.stringify(j))' "$SECRETS"
+  echo "Order alert email token included"
+else
+  echo "PROTON_SMTP_TOKEN is not set; order alert emails stay off"
+fi
 if ! $WR pages secret bulk "$SECRETS" --project-name="$PROJECT" >/dev/null; then
   # Do not leave an endpoint whose signing secret never reached Cloudflare.
   [ -n "$NEW_ID" ] && curl -sS -u "$STRIPE_SECRET_KEY:" -X DELETE "https://api.stripe.com/v1/webhook_endpoints/$NEW_ID" >/dev/null

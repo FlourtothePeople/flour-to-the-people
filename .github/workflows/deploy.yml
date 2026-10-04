@@ -44,6 +44,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          PROTON_SMTP_TOKEN: ${{ secrets.PROTON_SMTP_TOKEN }}
           SITE_URL: https://flour-to-the-people-5vp.pages.dev
         run: bash scripts/ci-payments.sh
 
@@ -56,6 +57,25 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy public --project-name=flour-to-the-people --branch=main
+
+      # Sends a sample order alert email when this run was started by hand from the
+      # Actions tab, or the commit message contains "[send test order alert]".
+      # The result is recorded on the commit as the status "Order alert test".
+      - name: Send a test order alert email
+        if: success() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[send test order alert]'))
+        env:
+          GH_TOKEN: ${{ github.token }}
+          URL: ${{ steps.deploy.outputs.deployment-url }}
+          PROTON_SMTP_TOKEN: ${{ secrets.PROTON_SMTP_TOKEN }}
+        run: |
+          sleep 10
+          RESP="$(curl -sS -m 60 -X POST "$URL/api/order-alert-test" -H "Authorization: Bearer $PROTON_SMTP_TOKEN" || echo '{"sent":false,"error":"request failed"}')"
+          echo "$RESP"
+          DESC="$(printf '%s' "$RESP" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let j;try{j=JSON.parse(s)}catch{j={error:s}};process.stdout.write(j.sent?"Test email sent":("Failed: "+(j.error||s)).slice(0,135))})')"
+          STATE=failure; [ "$DESC" = "Test email sent" ] && STATE=success
+          gh api "repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+            -f state="$STATE" -f context="Order alert test" -f description="$DESC"
+          [ "$STATE" = success ]
 
       # Records the deployed web address on the commit, so anyone (or any agent)
       # can find it on GitHub without reading the logs.

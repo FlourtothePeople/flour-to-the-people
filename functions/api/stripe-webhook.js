@@ -11,8 +11,10 @@
 // IDs in D1 so retries from Stripe don't double-fulfill.
 
 import { verifyAndParseStripeEvent } from '../_lib/webhook.js';
+import { sendMail, orderAlert, DEFAULT_ALERT_TO } from '../_lib/mailer.js';
+import { connect } from '../_lib/smtp-socket.js';
 
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ request, env, waitUntil }) {
   if (!env.STRIPE_WEBHOOK_SECRET) {
     console.error('STRIPE_WEBHOOK_SECRET not configured');
     return new Response('Server misconfigured', { status: 500 });
@@ -48,6 +50,7 @@ export async function onRequestPost({ request, env }) {
     switch (event.type) {
       case 'payment_intent.amount_capturable_updated':
         await upsertOrder(event.data.object, env, 'awaiting_approval');
+        alertMill(event.data.object, env, waitUntil);
         break;
 
       case 'payment_intent.succeeded':
@@ -179,4 +182,19 @@ async function handleRefund(event, env) {
     Math.floor(Date.now() / 1000),
     pi
   ).run();
+}
+
+// Emails the mill about a new order on hold (from orders@flourtothepeople.org
+// to ORDER_ALERT_TO, default the mill's Proton inbox). Runs after the response
+// so Stripe never waits on email; a failed email is logged, never retried, and
+// never blocks recording the order.
+function alertMill(pi, env, waitUntil) {
+  if (!env.PROTON_SMTP_TOKEN) return;
+  const job = sendMail({
+    connect,
+    token: env.PROTON_SMTP_TOKEN,
+    to: env.ORDER_ALERT_TO || DEFAULT_ALERT_TO,
+    ...orderAlert(pi),
+  }).catch((e) => console.error('Order alert email failed:', e.message));
+  if (waitUntil) waitUntil(job);
 }
