@@ -21,6 +21,7 @@ Follow these rules when changing `public/index.html`. Items marked "checked" are
 
 - Use "worker-owned and controlled" and "syndicate" (the earlier text said "cooperative"). The location subtitle is "Appalachia".
 - Product descriptions and ingredient lists were corrected from the actual bag labels (commit `83b02cd`). Do not reword ingredients without the label in hand.
+- **Never call grain or flour "organic" in ingredient lists or product text.** Since October 2026 every grain is either certified organic or grown in and around Floyd County by small farmers who never spray it (soil free of pesticide residue), and it varies by batch; all of it is non-GMO. Under USDA rules (7 CFR 205.310) grain from small exempt farms may not be represented as organic in a product someone else processes, so ingredient lists name the grain only, and the sourcing is explained once in the "Organic or Better" box and the FAQ. "Never sprayed" applies only to the local grain (certified organic allows approved sprays), so the tagline says "Non-GMO".
 
 ## Designs tried and rejected (do not propose them again)
 
