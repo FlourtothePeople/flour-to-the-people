@@ -1313,6 +1313,15 @@ ol.rc-list li::before {
 .hero-logo{width:min(440px,80vw);height:auto;display:block}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
+<style>
+/* accessibility: 44px targets, silent decorative arrows */
+.cx{min-width:44px !important;min-height:44px !important;}
+.topbar > .cbtn{min-height:44px;}
+.manifesto-head::after{content:'\25BE' / '' !important;}
+.mh-btn{display:inline;}
+.mh-btn:focus-visible{outline:2px solid #F0EDE6;outline-offset:3px;}
+.fc a{display:inline-block;min-height:24px;}
+</style>
 <style>.src-note{font-size:13px;line-height:1.5;color:#D0CCC8;margin:0 0 12px;max-width:80ch}</style>
 </head>
 <body>
@@ -1351,14 +1360,15 @@ ol.rc-list li::before {
   <div class="manifesto-item"><div class="manifesto-head">Worker-Owned</div>
       <p class="manifesto-body">We own and run the mill ourselves. No outside investors, no shareholders — the people doing the work make the decisions and share what we earn.</p></div>
   </div>
-  <div class="filters" id="filt-anchor" role="radiogroup" aria-label="Filter products by category">
-    <button class="fb on" style="--ac:var(--r)" onclick="filt('all',this)" aria-pressed="true" role="radio">All</button>
-    <button class="fb" onclick="filt('bread',this)" aria-pressed="false" role="radio">Bread Flours</button>
-    <button class="fb" onclick="filt('ancient',this)" aria-pressed="false" role="radio">Ancient Grains</button>
-    <button class="fb" onclick="filt('gf',this)" aria-pressed="false" role="radio">Gluten-Free</button>
-    <button class="fb" onclick="filt('corn',this)" aria-pressed="false" role="radio">Corn</button>
-    <button class="fb" onclick="filt('mix',this)" aria-pressed="false" role="radio">Mixes</button>
-    <button class="fb" onclick="filt('grainfree',this)" aria-pressed="false" role="radio">Grain-Free Flours</button>
+  <h2 class="sr-only">Products</h2>
+  <div class="filters" id="filt-anchor" role="group" aria-label="Filter products by category">
+    <button class="fb on" style="--ac:var(--r)" onclick="filt('all',this)" aria-pressed="true">All</button>
+    <button class="fb" onclick="filt('bread',this)" aria-pressed="false">Bread Flours</button>
+    <button class="fb" onclick="filt('ancient',this)" aria-pressed="false">Ancient Grains</button>
+    <button class="fb" onclick="filt('gf',this)" aria-pressed="false">Gluten-Free</button>
+    <button class="fb" onclick="filt('corn',this)" aria-pressed="false">Corn</button>
+    <button class="fb" onclick="filt('mix',this)" aria-pressed="false">Mixes</button>
+    <button class="fb" onclick="filt('grainfree',this)" aria-pressed="false">Grain-Free Flours</button>
   </div>
   <p class="src-note">* Every grain is certified organic, or grown in and around Floyd County by small farmers using regenerative practices, without pesticides. Which one varies by batch. Always non-GMO.</p>
   <div class="pgrid" id="hgrid">
@@ -1395,7 +1405,7 @@ ol.rc-list li::before {
     <tr><td><div class="ln">Roanoke Co+op</div><div class="lloc">1319 Grandin Rd SW</div></td><td>Daily 7am–9pm</td></tr>
   </tbody></table>
 </div>
-<footer class="footer" style="--ac:var(--r)"><div class="fg2"><div class="fb2"><div class="logo">Flour to the People<small style="color:var(--r)">Worker-Owned · Appalachia</small></div><p>Stone-milled whole-grain flour from a worker-owned mill in the Southern Blue Ridge.</p></div><div class="fc"><h5 style="color:var(--r)">Navigate</h5><ul><li><a onclick="go('home',tabs[0],false)">Home</a></li><li><a onclick="scrollToFlours()">Shop</a></li><li><a onclick="go('bulk',tabs[2],false)">Bulk</a></li><li><a onclick="go('recipes',tabs[3],true)">Recipes</a></li><li><a onclick="go('faqs',tabs[4],true)">FAQs</a></li><li><a onclick="go('contact',tabs[5],false)">Contact</a></li></ul></div><div class="fc"><h5 style="color:var(--r)">Contact</h5><address>519 Roberson Mill Rd SE<br>Floyd, VA 24091<br>(276) 340-0288<br>FlourtothePeople@protonmail.com</address></div></div><div class="fbot"><span>© <span id="cy">2026</span> Flour to the People</span><script>document.getElementById("cy").textContent=new Date().getFullYear();</script><span>Whole grain · Stone-milled</span></div></footer>
+<footer class="footer" style="--ac:var(--r)"><div class="fg2"><div class="fb2"><div class="logo">Flour to the People<small style="color:var(--r)">Worker-Owned · Appalachia</small></div><p>Stone-milled whole-grain flour from a worker-owned mill in the Southern Blue Ridge.</p></div><div class="fc"><h5 style="color:var(--r)">Navigate</h5><ul><li><a href="#" onclick="go('home',tabs[0],false);return false;">Home</a></li><li><a href="#" onclick="scrollToFlours();return false;">Shop</a></li><li><a href="#" onclick="go('bulk',tabs[2],false);return false;">Bulk</a></li><li><a href="#" onclick="go('recipes',tabs[3],true);return false;">Recipes</a></li><li><a href="#" onclick="go('faqs',tabs[4],true);return false;">FAQs</a></li><li><a href="#" onclick="go('contact',tabs[5],false);return false;">Contact</a></li></ul></div><div class="fc"><h5 style="color:var(--r)">Contact</h5><address>519 Roberson Mill Rd SE<br>Floyd, VA 24091<br>(276) 340-0288<br>FlourtothePeople@protonmail.com</address></div></div><div class="fbot"><span>© <span id="cy">2026</span> Flour to the People</span><script>document.getElementById("cy").textContent=new Date().getFullYear();</script><span>Whole grain · Stone-milled</span></div></footer>
 </div>
 
 <!-- RECIPES (green) -->
@@ -1606,7 +1616,7 @@ ol.rc-list li::before {
 
 <!-- CART -->
 <div class="cov" id="cov" onclick="closeCart()"></div>
-<div class="cpanel" id="cpanel" role="dialog" aria-modal="true" aria-label="Shopping cart" aria-live="polite">
+<div class="cpanel" id="cpanel" role="dialog" aria-modal="true" aria-label="Shopping cart" inert>
   <div class="chd"><h3 id="cart-title">Your Cart</h3><button class="cx" onclick="closeCart()" aria-label="Close cart">✕</button></div>
   <div class="citems" id="citems"></div>
   <div class="cft">
@@ -1938,6 +1948,54 @@ document.querySelectorAll('.manifesto-item').forEach(function(it){
     if(e.key==='Enter'||e.key===' '){e.preventDefault();this.click();}
   });
 });
+</script>
+<script>
+/* Accessibility layer: keyboard and screen-reader behavior on top of the original handlers. */
+(function(){
+  // Tabs: Enter/Space activate; mark the current page
+  function markCurrent(){tabs.forEach(function(t){if(t.classList.contains('on'))t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});}
+  tabs.forEach(function(t){t.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();t.click();}});});
+  var _go=go;go=function(n,t,eco){_go(n,t,eco);markCurrent();var h=document.querySelector('#pg-'+n+' h1');if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}};
+  var _sf=scrollToFlours;scrollToFlours=function(){_sf();markCurrent();};
+  markCurrent();
+  // Expandable items: the button is the title only, inside a heading
+  document.querySelectorAll('.manifesto-item').forEach(function(it,i){
+    var head=it.querySelector('.manifesto-head');if(!head)return;
+    var body=it.querySelector('.manifesto-body');
+    it.removeAttribute('role');it.removeAttribute('tabindex');it.removeAttribute('aria-expanded');
+    var level=it.classList.contains('recipe-card')?2:(it.closest('.faq-mode')?3:2);
+    head.setAttribute('role','heading');head.setAttribute('aria-level',String(level));
+    var b=document.createElement('span');b.className='mh-btn';b.setAttribute('role','button');b.setAttribute('tabindex','0');
+    b.setAttribute('aria-expanded','false');
+    if(body){if(!body.id)body.id='mbody-'+i;b.setAttribute('aria-controls',body.id);}
+    while(head.firstChild)b.appendChild(head.firstChild);head.appendChild(b);
+    function sync(){var open=it.classList.contains('expanded');it.removeAttribute('aria-expanded');b.setAttribute('aria-expanded',open?'true':'false');if(body)body.setAttribute('aria-hidden',open?'false':'true');}
+    sync();it.addEventListener('click',sync);
+    it.querySelectorAll('.rc-content h4, .manifesto-body h4').forEach(function(h){h.setAttribute('aria-level','3');});
+  });
+  // Footer headings sit at level 2
+  document.querySelectorAll('.fc h5').forEach(function(h){h.setAttribute('aria-level','2');});
+  // Add-to-cart buttons say which product
+  document.querySelectorAll('.pc .atc').forEach(function(btn){var pc=btn.closest('.pc');var h=pc&&pc.querySelector('h3');var img=pc&&pc.querySelector('img');
+    if(h){var size=img&&img.alt.match(/,\s*([^,]+)$/);btn.setAttribute('aria-label','Add '+h.textContent.trim()+(size?', '+size[1]:'')+' to cart');}});
+  // Dialogs: cart and checkout
+  var cpanel=document.getElementById('cpanel'),mbg=document.getElementById('mbg'),opener=null;
+  var _oc=openCart;openCart=function(){opener=document.activeElement;cpanel.removeAttribute('inert');_oc();};
+  var _cc=closeCart;closeCart=function(){var wasOpen=cpanel.classList.contains('on');_cc();cpanel.setAttribute('inert','');if(!wasOpen&&opener===null){}};
+  var _ock=openCheckout;openCheckout=function(){_ock();if(mbg.classList.contains('on')){setTimeout(function(){var f=mbg.querySelector('#fname')||mbg.querySelector('.cx');if(f)f.focus();},50);}};
+  var _cck=closeCheckout;closeCheckout=function(){_cck();var c=document.querySelector('.cbtn');if(c)c.focus();};
+  function visible(el){return !!(el.offsetWidth||el.offsetHeight||el.getClientRects().length);}
+  document.addEventListener('keydown',function(e){
+    var dlg=mbg.classList.contains('on')?mbg:(cpanel.classList.contains('on')?cpanel:null);if(!dlg)return;
+    if(e.key==='Escape'){e.preventDefault();if(dlg===mbg)closeCheckout();else closeCart();return;}
+    if(e.key!=='Tab')return;
+    var f=[].filter.call(dlg.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"]),iframe'),visible);
+    if(!f.length)return;var first=f[0],last=f[f.length-1];
+    if(!dlg.contains(document.activeElement)){e.preventDefault();first.focus();return;}
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  });
+})();
 </script>
 </body>
 </html>
