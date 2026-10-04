@@ -6,7 +6,7 @@ Follow these rules when changing `public/index.html`. Items marked "checked" are
 
 - The site has five tabs in the top bar: Home, Shop, Recipes, FAQs, Contact. Shop does not open its own page; it scrolls Home to the product filter row (`id="filt-anchor"`, function `scrollToFlours()`).
 - Home, Shop, and Contact use the red and black scheme. Recipes and FAQs use the green and black scheme (the tab class `g`). The top bar border and the selected tab take the page's color.
-- The filter buttons above the products are All, Bread Flours, Ancient Grains, Gluten-Free, Corn, Mixes, and Grain-Free Flours (checked). Corn meals and grits are `corn`, not `mix`. A product may belong to several categories through the space-separated `data-c` attribute (for example `ancient gf`).
+- The filter buttons above the products are All, Bread Flours, Ancient Grains, Gluten-Free, Corn, Mixes, and Grain-Free Flours (checked). Corn meals and grits are `corn`, not `mix`; Mixes holds the Pizza Dough Flour, Gluten-Free Flour Blend and Buckwheat Pancake Mix; Scottish Oatmeal has no category. A product may belong to several categories through the space-separated `data-c` attribute (for example `ancient gf`).
 - Recipe cards open on click and stay open (checked: the click handler tests `classList.contains('recipe-card')`).
 
 ## Type, size, and color
@@ -14,6 +14,8 @@ Follow these rules when changing `public/index.html`. Items marked "checked" are
 - **No font size below 12px, anywhere** (checked by `npm run check`). Inline `style=""` attributes override stylesheet rules, so earlier violations came from inline attributes. Address lines and hours in the location tables had `font-size:9px` inline until they were replaced by classes.
 - The font variables `--fd`, `--fb`, and `--fc` start with `Space Mono`; body text falls back to Verdana (checked).
 - The palette variables are `--k` #0A0A0A, `--r` #CC0000, `--g` #1A6B1A, `--w` #F0EDE6 (checked). Prices use amber #FFA000 with a soft glow (checked).
+- **Accessibility is WCAG 2.2 AAA (October 2026).** Every text color must reach 7:1 contrast (4.5:1 for text 24px and up, or 18.66px bold), at every point in the hue cycles, at phone width too. No red can reach 7:1 against black, so text never sits on `--r` or in `--r`: red fills under text use `--r-deep` #A00000 with white or cream text, red text on black uses `--r-text` #FF8A80, and green fills under text use `--g-deep` #145214. `--r` and `--g` stay for borders, rays and other non-text color. The filter buttons use lighter rainbow fills (#FF7373, #FF8800, #E6C200, #00BB00, #00AFC8, #6E9BFF, #C080FF) so their black text passes. These overrides sit in the "AAA CONTRAST" block near the end of the stylesheet.
+- Keyboard and screen-reader behavior lives in the "Accessibility layer" script at the end of the file: tabs answer Enter and mark `aria-current`, expandable items are buttons inside headings, add-to-cart buttons name their product, and the cart and checkout trap focus and close with Escape. Keep these working when changing markup.
 - Color animations use OKLCH with `@property` so the hue changes smoothly. The top bar tabs cycle over 59 seconds (checked). Every animation needs a `prefers-reduced-motion` fallback (the file has five such blocks), and no animation may flash: keep luminance constant while hue changes.
 - The author prefers compact layouts: small padding and line height, one row instead of several where content fits.
 

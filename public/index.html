@@ -1314,6 +1314,35 @@ ol.rc-list li::before {
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 <style>
+/* ── AAA CONTRAST (Oct 2026): every text color meets WCAG AAA (7:1, 4.5:1 for large text) at every
+   point in the hue cycles. Red still carries the look, but text never sits on #CC0000 or in #CC0000:
+   red fills under text use --r-deep, red text on black uses --r-text. ── */
+:root{--r-deep:#A00000;--r-text:#FF8A80;--g-deep:#145214;}
+.topbar-nav .tab.on{background:var(--r-deep) !important;border-color:var(--r-deep) !important;color:#F0EDE6 !important;}
+.topbar-nav .tab.g.on{background:var(--g-deep) !important;border-color:var(--g-deep) !important;color:#F0EDE6 !important;}
+.topbar > .cbtn{background:var(--g-deep) !important;border-color:var(--g-deep) !important;color:#F0EDE6 !important;}
+.topbar > .cbtn .cart-num{color:oklch(0.96 0.07 var(--cart-hue)) !important;filter:none !important;animation:cart-num-hue 59s linear infinite !important;}
+@keyframes cart-num-hue{from{--cart-hue:0deg}to{--cart-hue:360deg}}
+.topbar > .cbtn .cart-sep{color:#F0EDE6 !important;opacity:.7 !important;}
+.filters .fb:nth-child(1){--tc:#FF7373;}
+.filters .fb:nth-child(2){--tc:#FF8800;}
+.filters .fb:nth-child(3){--tc:#E6C200;}
+.filters .fb:nth-child(4){--tc:#00BB00;}
+.filters .fb:nth-child(5){--tc:#00AFC8;}
+.filters .fb:nth-child(6){--tc:#6E9BFF;}
+.filters .fb:nth-child(7){--tc:#C080FF;}
+.atc,.btn-a,.toast{background:var(--r-deep) !important;color:#FFFFFF !important;}
+.btn-a{border-color:var(--r-deep) !important;}
+.badge{background:var(--r-deep) !important;color:#FFFFFF !important;}
+.badge.badge-a{background:#5C4200 !important;}
+.fc h5,.cip{color:var(--r-text) !important;}
+.cx{color:#D0CCC8 !important;}
+.qb,.rm{color:#B8B4B0 !important;}
+.rc-meta{color:oklch(0.84 0.14 calc(var(--hue) + 120deg)) !important;}
+.rc-content h4,ul.rc-list li::before,ol.rc-list li::before{color:oklch(0.88 0.16 calc(var(--hue) + 120deg)) !important;}
+.cx:hover,.qb:hover,.rm:hover{color:var(--r-text) !important;border-color:var(--r-text) !important;}
+@media (prefers-reduced-motion: reduce){.topbar > .cbtn .cart-num{animation:none !important;}}
+.pg h1[tabindex="-1"]:focus{outline:none;}
 /* accessibility: 44px targets, silent decorative arrows */
 .cx{min-width:44px !important;min-height:44px !important;}
 .topbar > .cbtn{min-height:44px;}
