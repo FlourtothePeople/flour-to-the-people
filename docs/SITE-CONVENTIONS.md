@@ -6,7 +6,7 @@ Follow these rules when changing `public/index.html`. Items marked "checked" are
 
 - The site has five tabs in the top bar: Home, Shop, Recipes, FAQs, Contact. Shop does not open its own page; it scrolls Home to the product filter row (`id="filt-anchor"`, function `scrollToFlours()`).
 - Home, Shop, and Contact use the red and black scheme. Recipes and FAQs use the green and black scheme (the tab class `g`). The top bar border and the selected tab take the page's color.
-- The filter buttons above the products are All, Bread Flours, Ancient Grains, Gluten-Free, Mixes, and Grain-Free Flours (checked). A product may belong to several categories through the space-separated `data-c` attribute (for example `ancient gf`).
+- The filter buttons above the products are All, Bread Flours, Ancient Grains, Gluten-Free, Corn, Mixes, and Grain-Free Flours (checked). Corn meals and grits are `corn`, not `mix`. A product may belong to several categories through the space-separated `data-c` attribute (for example `ancient gf`).
 - Recipe cards open on click and stay open (checked: the click handler tests `classList.contains('recipe-card')`).
 
 ## Type, size, and color
