@@ -18,7 +18,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Flour to the People","description":"Organic, stone-milled whole-grain flours from a worker-owned mill in Floyd, Virginia: bread flours, ancient grains, gluten-free flours, corn meal and grits, milled fresh to order.","url":"https://flourtothepeople.org/","image":"https://flourtothepeople.org/images/img-000-602b7441.jpg","telephone":"+1-276-340-0288","email":"FlourtothePeople@protonmail.com","address":{"@type":"PostalAddress","streetAddress":"708 Thompson Rd SE","addressLocality":"Floyd","addressRegion":"VA","postalCode":"24091","addressCountry":"US"},"openingHours":"Mo-Su 09:00-19:00"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Bowlby+One&family=Limelight&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono&text=0123456789&display=swap" rel="stylesheet">
 <style>
@@ -1305,10 +1304,14 @@ ol.rc-list li::before {
 .lloc{font-family:var(--fh);font-size:14px;color:#A8A4A0;line-height:1.4;margin-top:3px;font-weight:400;}
 .cv-hours{font-family:var(--fh);font-size:14px;color:#A8A4A0;margin-top:4px;font-weight:400;line-height:1.4;}
 </style>
-<style>.hero-alt{display:flex;align-items:center;justify-content:center;gap:clamp(18px,4vw,48px);padding:28px 16px 4px;width:100%;max-width:1000px}
-.hero-alt img{width:min(400px,44vw);height:auto;aspect-ratio:1;display:block}
-.hero-title{font-family:'Londrina Solid',Impact,sans-serif;font-weight:900;font-size:clamp(52px,9vw,112px);line-height:.88;color:#F0EDE6;margin:0;letter-spacing:.015em;text-transform:uppercase}
-@media (max-width:600px){.hero-alt{flex-direction:column;text-align:center}.hero-alt img{width:min(260px,70vw)}}</style>
+<style>
+.hero-logo-wrap{position:relative;width:100%;display:grid;place-items:center;padding:22px 16px;overflow:hidden;isolation:isolate}
+.hero-logo-wrap::before{content:"";position:absolute;inset:-60% -10%;z-index:-1;
+ background:repeating-conic-gradient(from -4deg at 50% 50%,#7a0000 0deg 7deg,transparent 7deg 15deg);
+ -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 0,#000 18%,transparent 58%);mask-image:radial-gradient(circle at 50% 50%,#000 0,#000 18%,transparent 58%)}
+.hero-logo{width:min(440px,80vw);height:auto;display:block}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
 </head>
 <body>
 <a href="#scroll" class="skip-nav">Skip to main content</a>
@@ -1329,7 +1332,7 @@ ol.rc-list li::before {
 <!-- HOME -->
 <div class="pg on" id="pg-home">
 <div class="hero" style="--ac:var(--r)">
-  <div class="hero-alt"><h1 class="hero-title">Flour<br>to the<br>People</h1><img src="images/hero-logo.jpg" alt="Flour to the People logo: a raised fist holding a sheaf of wheat inside a circle" width="900" height="900"></div>
+  <div class="hero-logo-wrap"><h1 class="sr-only">Flour to the People</h1><img class="hero-logo" src="images/hero-logo.png" alt="Flour to the People logo: a raised fist holding a sheaf of wheat, in a red ring" width="1000" height="1000"></div>
   <div class="hero-text">
     <div class="htag">Stone-Milled · Organic · Blue Ridge Mountains</div>
     <p class="hero-sub">A worker-owned mill in Appalachia. We stone-mill organic grains from local farms into fresh whole-grain flours that retain everything commercial milling strips away.</p>
