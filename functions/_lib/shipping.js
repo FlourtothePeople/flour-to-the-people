@@ -7,27 +7,40 @@
 //         (postcalc.usps.com/DomesticZoneChart). Update both when USPS changes prices
 //         (usually January and July).
 //
-// For each package the calculator compares:
-//   - USPS Ground Advantage by weight (flour + packaging, rounded up to the pound),
-//     only for packages of 5 lb or more (GA_MIN_LB)
-//   - Priority Mail Flat Rate Envelope / Padded Envelope / Medium / Large Flat Rate Box,
-//     when the order fits (FLAT_RATE capacities below, in 1.5 lb bag equivalents)
-// and charges the cheapest. The chosen method is returned so the mill knows
+// For each package (weight = flour + packaging, rounded up to the pound):
+//   - 5 lb or less (PRIORITY_MAX_LB): Priority Mail by weight, or a Priority Mail
+//     Flat Rate Envelope when the bags fit, whichever is cheaper.
+//   - Over 5 lb: USPS Ground Advantage by weight, or a Medium / Large Flat Rate
+//     Box when the bags fit, whichever is cheaper.
+// FLAT_RATE capacities are in 1.5 lb bag equivalents. The chosen method is returned so the mill knows
 // which label to buy.
 
 // Packaging weight added to the flour weight, in ounces.
 export const PACKAGING_OZ = { mailer: 4, box: 8 };
 // Orders up to this many 1.5 lb bag-equivalents (24 oz) ship in a poly mailer.
-export const MAILER_MAX_BAGS = 2;
+export const MAILER_MAX_BAGS = 3;
 
 // Priority Mail Flat Rate, commercial prices in cents. maxBags = how many 1.5 lb
 // bag-equivalents fit (a 3 lb all-purpose bag counts as 2). Adjust to what
 // actually fits in your packaging.
 export const FLAT_RATE = [
-  { name: 'Priority Mail Flat Rate Envelope',        cents: 1112, maxBags: 2 },
+  { name: 'Priority Mail Flat Rate Envelope',        cents: 1112, maxBags: 3 },
   { name: 'Priority Mail Padded Flat Rate Envelope', cents: 1199, maxBags: 2 },
   { name: 'Priority Mail Medium Flat Rate Box',      cents: 2117, maxBags: 4 },
   { name: 'Priority Mail Large Flat Rate Box',       cents: 3100, maxBags: 6 },
+];
+
+// Priority Mail commercial prices in cents (by weight, not flat rate or cubic),
+// used only for packages of PRIORITY_MAX_LB or less.
+// Row = weight in pounds (row 0 = 1 lb ... row 4 = 5 lb); column = zone 1..9.
+// These are the Notice 123 (Oct. 4, 2026) prices minus the holiday increase in
+// PEAK, which is added back while it is in effect.
+const PRIORITY_MAIL = [
+  [  904,   932,   971,  1040,  1297,  1447,  1508,  1522,  3248],
+  [  910,   939,   978,  1079,  1317,  1534,  1631,  1637,  3494],
+  [  945,   971,  1075,  1268,  1656,  1886,  2051,  2057,  4391],
+  [ 1097,  1122,  1252,  1496,  1988,  2451,  2676,  2682,  5723],
+  [ 1139,  1156,  1302,  1572,  2152,  2635,  2910,  2918,  6227],
 ];
 
 // USPS Ground Advantage commercial prices in cents.
@@ -106,8 +119,10 @@ const GROUND_ADVANTAGE = [
 ];
 
 const MAX_PACKAGE_LB = 70;
-// Packages lighter than this (flour + packaging) never ship Ground Advantage.
-export const GA_MIN_LB = 5;
+// Packages of this weight or less (flour + packaging, rounded up to the pound)
+// ship Priority Mail: by weight or Flat Rate Envelope, whichever is cheaper.
+// Heavier packages ship Ground Advantage or a Flat Rate box.
+export const PRIORITY_MAX_LB = 5;
 
 // USPS temporary holiday (peak season) price increase, commercial prices, in cents.
 // Source: USPS news release, Aug. 25, 2026; matches Notice 123 effective Oct. 4, 2026.
@@ -116,7 +131,9 @@ export const GA_MIN_LB = 5;
 export const PEAK = {
   start: Date.parse('2026-10-04T05:00:00Z'), // 12 a.m. CDT
   end:   Date.parse('2027-01-17T06:00:00Z'), // 12 a.m. CST
-  // Ground Advantage by billed weight: [max lb, zones 1-4, zones 5-9]
+  // Priority Mail by weight band: [max lb, zones 1-4, zones 5-9]
+  priority: [[3, 40, 85], [10, 65, 175], [25, 105, 385], [70, 315, 910]],
+  // Ground Advantage by weight band: [max lb, zones 1-4, zones 5-9]
   groundAdvantage: [[3, 40, 55], [10, 65, 105], [25, 105, 175], [70, 315, 770]],
   flatRateLarge: 175,
   flatRateOther: 85,
@@ -126,9 +143,9 @@ function peakActive(now) {
   return now >= PEAK.start && now < PEAK.end;
 }
 
-function groundAdvantagePeakCents(lb, zone, now) {
+function bandPeakCents(bands, lb, zone, now) {
   if (!peakActive(now)) return 0;
-  const band = PEAK.groundAdvantage.find(b => lb <= b[0]);
+  const band = bands.find(b => lb <= b[0]);
   return zone <= 4 ? band[1] : band[2];
 }
 
@@ -165,17 +182,24 @@ function quotePackage(bags, zone, now) {
   const pack = bags <= MAILER_MAX_BAGS ? PACKAGING_OZ.mailer : PACKAGING_OZ.box;
   const lb = Math.ceil((oz + pack) / 16);
   if (lb > MAX_PACKAGE_LB) return null;
-  let best = null;
-  for (const f of FLAT_RATE) {
-    const cents = f.cents + flatRatePeakCents(f.name, now);
-    if (bags <= f.maxBags && (!best || cents < best.cents)) best = { method: f.name, cents };
+  const priority = lb <= PRIORITY_MAX_LB;
+  let best;
+  if (priority) {
+    best = {
+      method: 'Priority Mail, ' + lb + ' lb',
+      cents: PRIORITY_MAIL[lb - 1][zone - 1] + bandPeakCents(PEAK.priority, lb, zone, now),
+    };
+  } else {
+    best = {
+      method: 'USPS Ground Advantage, ' + lb + ' lb',
+      cents: groundAdvantageCents(oz + pack, zone) + bandPeakCents(PEAK.groundAdvantage, lb, zone, now),
+    };
   }
-  // The mill does not use Ground Advantage for packages under GA_MIN_LB;
-  // those go Priority Mail Flat Rate. Ground Advantage is only a fallback
-  // if no flat-rate option fits.
-  if (lb >= GA_MIN_LB || !best) {
-    const ga = groundAdvantageCents(oz + pack, zone) + groundAdvantagePeakCents(lb, zone, now);
-    if (!best || ga < best.cents) best = { method: 'USPS Ground Advantage, ' + lb + ' lb', cents: ga };
+  for (const f of FLAT_RATE) {
+    // Packages of PRIORITY_MAX_LB or less go in an envelope; heavier ones in a box.
+    if (priority !== /Envelope/.test(f.name)) continue;
+    const cents = f.cents + flatRatePeakCents(f.name, now);
+    if (bags <= f.maxBags && cents < best.cents) best = { method: f.name, cents };
   }
   return best;
 }
