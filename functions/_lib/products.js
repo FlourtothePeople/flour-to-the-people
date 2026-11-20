@@ -7,6 +7,7 @@
 
 export const PRODUCTS = {
   ap: { name: 'All-Purpose Flour',     price_cents: 1600, size: '3 lb',   weight_oz: 48 },
+  bf: { name: 'Bread Flour',           price_cents: 1500, size: '3 lb',   weight_oz: 48 },
   ry: { name: 'Rye Flour',             price_cents:  900, size: '1.5 lb', weight_oz: 24 },
   pz: { name: 'Pizza Dough Flour',     price_cents: 1200, size: '1.5 lb', weight_oz: 24 },
   pa: { name: 'Pastry Flour',          price_cents: 1200, size: '1.5 lb', weight_oz: 24 },
