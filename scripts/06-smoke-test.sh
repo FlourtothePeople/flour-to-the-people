@@ -34,7 +34,10 @@ if [ "$MODE" = test ]; then
   CODE="$(post '{"cart":[{"id":"ap","qty":1}],"email":"smoke-test@example.com","name":"Smoke Test",'"$ADDR"'}')"
   expect "valid cart creates a PaymentIntent (200)" 200 "$CODE"
   PI="$(jget orderId </tmp/fttp-smoke.json)"; TOTAL="$(jget amount.total_cents </tmp/fttp-smoke.json)"
-  expect "total = \$16.00 product + \$9.28 shipping (Ground Advantage 4 lb, zone 1) + \$0.16 VA tax (2544 cents)" 2544 "$TOTAL"
+  # Expected total: $16.00 product + shipping to 24091 from functions/_lib/shipping.js
+  # (includes the USPS holiday increase when in effect) + $0.16 VA tax.
+  WANT="$(node -e 'import("./functions/_lib/shipping.js").then(m=>process.stdout.write(String(1600+m.calculateShipping(48,"24091").cents+16)))')"
+  expect "total = \$16.00 product + shipping to 24091 + \$0.16 VA tax ($WANT cents)" "$WANT" "$TOTAL"
   if [ "$E2E" = 1 ] && [ -n "$PI" ]; then
     say "End-to-end payment with Stripe test card token"
     R="$(stripe_api POST "/v1/payment_intents/$PI/confirm" -d payment_method=pm_card_visa --data-urlencode return_url="https://example.com")"
@@ -43,11 +46,11 @@ if [ "$MODE" = test ]; then
     d1row() { wr d1 execute "$D1_NAME" --remote --command "SELECT fulfillment_status||':'||total_cents AS t FROM orders WHERE id='$PI'" --json 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const r=JSON.parse(s)[0].results;process.stdout.write(r.length?String(r[0].t):"")}catch(e){}})'; }
     waitrow() { GOT=""; for _ in $(seq 1 12); do GOT="$(d1row)"; [ "$GOT" = "$1" ] && break; sleep 5; done; }
     info "waiting up to 60 seconds for the webhook to record the order as awaiting approval"
-    waitrow "awaiting_approval:2544"; expect "order row in D1 after hold" "awaiting_approval:2544" "$GOT"
+    waitrow "awaiting_approval:$WANT"; expect "order row in D1 after hold" "awaiting_approval:$WANT" "$GOT"
     R="$(stripe_api POST "/v1/payment_intents/$PI/capture")"
     expect "PaymentIntent status after capture" succeeded "$(printf '%s' "$R" | jget status)"
     info "waiting up to 60 seconds for the webhook to mark the order ready to ship"
-    waitrow "pending:2544"; expect "order row in D1 after capture" "pending:2544" "$GOT"
+    waitrow "pending:$WANT"; expect "order row in D1 after capture" "pending:$WANT" "$GOT"
     wr d1 execute "$D1_NAME" --remote --command "DELETE FROM orders WHERE id='$PI'" --yes >/dev/null 2>&1 && ok "test order $PI removed from D1"
   fi
 elif [ "$MODE" = live ]; then

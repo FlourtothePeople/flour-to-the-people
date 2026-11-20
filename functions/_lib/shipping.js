@@ -1,7 +1,8 @@
 // Shipping: the cheapest USPS option at Click-N-Ship (commercial) prices,
 // from the mill in Floyd, VA (ZIP 24091) to the customer's ZIP code.
 //
-// Prices: USPS Notice 123, effective July 12, 2026 (pe.usps.com).
+// Prices: USPS Notice 123, effective July 12, 2026 (pe.usps.com), plus the
+//         temporary holiday increase in PEAK below while it is in effect.
 // Zones:  USPS domestic zone chart for origin ZIP3 240, effective October 1, 2026
 //         (postcalc.usps.com/DomesticZoneChart). Update both when USPS changes prices
 //         (usually January and July).
@@ -104,6 +105,34 @@ const GROUND_ADVANTAGE = [
 
 const MAX_PACKAGE_LB = 70;
 
+// USPS temporary holiday (peak season) price increase, commercial prices, in cents.
+// Source: USPS news release, Aug. 25, 2026; matches Notice 123 effective Oct. 4, 2026.
+// In effect from 12 a.m. CT Oct. 4, 2026 until 12 a.m. CT Jan. 17, 2027.
+// Outside these dates nothing is added. Each year USPS announces new amounts and dates.
+export const PEAK = {
+  start: Date.parse('2026-10-04T05:00:00Z'), // 12 a.m. CDT
+  end:   Date.parse('2027-01-17T06:00:00Z'), // 12 a.m. CST
+  // Ground Advantage by billed weight: [max lb, zones 1-4, zones 5-9]
+  groundAdvantage: [[3, 40, 55], [10, 65, 105], [25, 105, 175], [70, 315, 770]],
+  flatRateLarge: 175,
+  flatRateOther: 85,
+};
+
+function peakActive(now) {
+  return now >= PEAK.start && now < PEAK.end;
+}
+
+function groundAdvantagePeakCents(lb, zone, now) {
+  if (!peakActive(now)) return 0;
+  const band = PEAK.groundAdvantage.find(b => lb <= b[0]);
+  return zone <= 4 ? band[1] : band[2];
+}
+
+function flatRatePeakCents(name, now) {
+  if (!peakActive(now)) return 0;
+  return /Large/.test(name) ? PEAK.flatRateLarge : PEAK.flatRateOther;
+}
+
 // Zone by 3-digit ZIP prefix: character i of this string is the zone for ZIP3 i
 // ("0" = prefix not in use).
 const ZONE_BY_ZIP3 = '0000047777444444455555555554445555455555555555555554445555554444444444444444444444444444444444444444444444444444444444444444444445444444444444444444443333333343333444344434333444444444444444444444444333333333333330333334333333332223333333321121222222232232232233223323201222222233222333233333333332343444433433444444444444444444455555555555555040550544404444444444445444444344233344444345444554555444344333333333233223204444433400333344433344333333433334333343444444444444444444444444444444444444445555555555555555555000555555555054404505555555555555550555555555555666005566666600666666667077777777884444444444545454444440454444444405554444550055555555555555505550555555665556666655055556666666000000550555555055555055555554455555550656656655055555555555555555665666666650556555666666666666666666667766667666666777777000676777777777877888807777777700777807770770088700007707777677766767000888088808808888888880888888888888888888808888888888888888888888888888888888888889888888888888888880888888888888';
@@ -127,14 +156,18 @@ function groundAdvantageCents(weight_oz, zone) {
 }
 
 // Cheapest way to ship ONE package holding `bags` bag-equivalents (24 oz each).
-function quotePackage(bags, zone) {
+function quotePackage(bags, zone, now) {
   const oz = bags * 24;
   const pack = bags <= MAILER_MAX_BAGS ? PACKAGING_OZ.mailer : PACKAGING_OZ.box;
   const lb = Math.ceil((oz + pack) / 16);
   if (lb > MAX_PACKAGE_LB) return null;
-  let best = { method: 'USPS Ground Advantage, ' + lb + ' lb', cents: groundAdvantageCents(oz + pack, zone) };
+  let best = {
+    method: 'USPS Ground Advantage, ' + lb + ' lb',
+    cents: groundAdvantageCents(oz + pack, zone) + groundAdvantagePeakCents(lb, zone, now),
+  };
   for (const f of FLAT_RATE) {
-    if (bags <= f.maxBags && f.cents < best.cents) best = { method: f.name, cents: f.cents };
+    const cents = f.cents + flatRatePeakCents(f.name, now);
+    if (bags <= f.maxBags && cents < best.cents) best = { method: f.name, cents };
   }
   return best;
 }
@@ -142,7 +175,7 @@ function quotePackage(bags, zone) {
 // Returns { cents, zone, method } or throws Error with a user-safe message.
 // Tries shipping the order as 1, 2, 3 ... packages (bags split as evenly as
 // possible) and keeps the cheapest total.
-export function calculateShipping(total_weight_oz, postal_code) {
+export function calculateShipping(total_weight_oz, postal_code, now = Date.now()) {
   const zone = zoneForZip(postal_code);
   if (!zone) throw new Error('Please enter a valid US ZIP code for shipping');
   const bags = Math.max(1, Math.ceil(total_weight_oz / 24));
@@ -152,7 +185,7 @@ export function calculateShipping(total_weight_oz, postal_code) {
     const methods = [];
     let ok = true;
     for (let i = 0; i < n; i++) {
-      const q = quotePackage(Math.floor(bags / n) + (i < bags % n ? 1 : 0), zone);
+      const q = quotePackage(Math.floor(bags / n) + (i < bags % n ? 1 : 0), zone, now);
       if (!q) { ok = false; break; }
       cents += q.cents;
       methods.push(q.method);
